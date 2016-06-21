@@ -38,3 +38,12 @@ Other plugins should be in 'aml/mods'.
     - mods
       - (other plugins)
 ```
+
+# Structure
+There are three critical component in AML: AMLLoader, AMLInjected and PluginUtils.
+
+AMLLoader is the executable file used to start the game process and load AMLInjected into that process. It may have more functions (such as act as a config tool and forward network messages from online game platforms) in the future.
+
+AMLInjected is the first DLL injected into the game process and the only one by AMLLoader. It then loads other DLLs including plugins. The nuget package Unmanaged Exports is used to export a function (of course writted in C#) so that is can be found by Windows API GetProcAddress. The AMLLoader then use this address to start the modloader. (DllMain can not be managed so we have to export a function.)
+
+PluginUtils is the first DLL loaded by AMLInjected. It acts as a common library used by all other plugins. It will also be the only file one needed to develop a plugin for AML. The NativeWrapper class in it allow other plugins to inject C# codes into the game. It also contains some basic functions such as injecting into Squirrel VM and DirectX Device and therefore other plugins don't need to inject them.
