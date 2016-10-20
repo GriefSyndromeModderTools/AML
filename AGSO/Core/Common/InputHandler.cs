@@ -16,7 +16,7 @@ namespace AGSO.Core.Common
         static InputHandler()
         {
             AGSO.Misc.GSO2ReplayFile rep = new Misc.GSO2ReplayFile(
-                @"E:\Games\[game]GRIEFSYNDROME\griefsyndrome\replay\20161017_152953.rep");
+                @"E:\Games\[game]GRIEFSYNDROME\griefsyndrome\replay\20161006_234348.rep");
             _Rep = rep.InputData;
 
             var keyconfigData = System.IO.File.ReadAllBytes(
@@ -33,6 +33,10 @@ namespace AGSO.Core.Common
 
         public static void Aquire(IntPtr data)
         {
+            if (_RepOffset == 0)
+            {
+                AGSO.Core.FP.FPCode.Run();
+            }
             if (_RepOffset >= 0)
             {
                 for (int p = 0; p < 3; p++)
