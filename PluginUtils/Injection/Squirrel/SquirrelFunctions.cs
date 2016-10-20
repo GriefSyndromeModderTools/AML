@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PluginUtils.Injection.Squirrel
 {
-    internal class SquirrelFunctions
+    public class SquirrelFunctions
     {
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate IntPtr Delegate_I_P(int arg);
@@ -25,11 +25,19 @@ namespace PluginUtils.Injection.Squirrel
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int Delegate_PII_I(IntPtr arg1, int arg2, int arg3);
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate int Delegate_PIP_I(IntPtr arg1, int arg2, IntPtr arg3);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void Delegate_PPI_V(IntPtr arg1, IntPtr arg2, int arg3);
+
         public static Delegate_P_V pushroottable;
         public static Delegate_PSI_V pushstring;
         public static Delegate_PI_V pushinteger;
         public static Delegate_PII_I newslot;
         public static Delegate_PI_V pop;
+        public static Delegate_PPI_V newclosure;
+        public static Delegate_PIP_I getinteger;
 
         static SquirrelFunctions()
         {
@@ -38,6 +46,8 @@ namespace PluginUtils.Injection.Squirrel
             pushinteger = GetFunction<Delegate_PI_V>(0x12B7B0);
             newslot = GetFunction<Delegate_PII_I>(0x12DBC0);
             pop = GetFunction<Delegate_PI_V>(0x12BC90);
+            newclosure = GetFunction<Delegate_PPI_V>(0x12EA10);
+            getinteger = GetFunction<Delegate_PIP_I>(0x12BA90);
         }
 
         private static T GetFunction<T>(uint offset)

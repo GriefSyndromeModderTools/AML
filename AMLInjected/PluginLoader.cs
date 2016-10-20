@@ -15,6 +15,7 @@ namespace AMLInjected
         {
             IAMLPlugin cp = (IAMLPlugin)plugin;
             _Plugins.Add(cp);
+            PluginUtils.Log.LoggerManager.PluginCreated(cp);
         }
 
         public static void FinishLoadPlugin()

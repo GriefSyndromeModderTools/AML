@@ -15,6 +15,17 @@ namespace PluginUtils.Injection.Native
             return IntPtr.Add(NativeFunctions.GetModuleHandle(null), (int)offset);
         }
 
+        public static IntPtr CodeOffset(string module, uint offset)
+        {
+            //TODO int overflow?
+            var m = NativeFunctions.GetModuleHandle(module);
+            if (m == IntPtr.Zero)
+            {
+                return m;
+            }
+            return IntPtr.Add(m, (int)offset);
+        }
+
         public static IntPtr VirtualTable(IntPtr obj, int index)
         {
             IntPtr pTable = Marshal.ReadIntPtr(obj);

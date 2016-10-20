@@ -10,7 +10,7 @@ namespace PluginUtils.Injection.Direct3D
 {
     class Direct3DInjectorPlugin : IAMLPlugin
     {
-        private static IntPtr _Device;
+        //private static IntPtr _Device;
 
         public void Init()
         {
@@ -77,8 +77,8 @@ namespace PluginUtils.Injection.Direct3D
                     env.GetParameterI(4),
                     env.GetParameterP(5),
                     pResult);
-                _Device = Marshal.ReadIntPtr(pResult);
                 env.SetReturnValue((IntPtr)ret);
+                Direct3DHelper.OnDeviceCreated(Marshal.ReadIntPtr(pResult));
             }
         }
     }

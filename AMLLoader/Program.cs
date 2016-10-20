@@ -16,8 +16,10 @@ namespace AMLLoader
         /// 应用程序的主入口点。
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
+            MessageBox.Show("Loader");
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
@@ -32,7 +34,12 @@ namespace AMLLoader
             pSec.nLength = Marshal.SizeOf(pSec);
             tSec.nLength = Marshal.SizeOf(tSec);
 
-            retValue = Natives.CreateProcess("griefsyndrome.exe", null,
+            var processName = "griefsyndrome.exe";
+            if (args.Contains("-o"))
+            {
+                processName = "griefsyndrome_online.exe";
+            }
+            retValue = Natives.CreateProcess(processName, null,
                 ref pSec, ref tSec, false, NORMAL_PRIORITY_CLASS | CREATE_SUSPENDED,
                 IntPtr.Zero, null, ref sInfo, out pInfo);
 
@@ -78,7 +85,10 @@ namespace AMLLoader
                 loader = (IntPtr)returnedValue;
             }
 
-            System.Windows.Forms.MessageBox.Show("Loader = " + loader.ToString());
+            if (loader.ToInt32() == 0)
+            {
+                MessageBox.Show("Loader function not found.");
+            }
             //Third call: run loader
             {
                 IntPtr lpThreadID;

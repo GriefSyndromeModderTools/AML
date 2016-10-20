@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="IAMLPlugin.cs" />
     <Compile Include="IAMLPluginManager.cs" />
+    <Compile Include="Injection\Direct3D\Direct3DHelper.cs" />
     <Compile Include="Injection\Direct3D\Direct3DInjectorPlugin.cs" />
     <Compile Include="Injection\Native\AddressHelper.cs" />
     <Compile Include="Injection\Native\AssemblyCodeStorage.cs" />
@@ -49,7 +50,11 @@
     <Compile Include="Injection\Native\NativeFunctions.cs" />
     <Compile Include="Injection\Native\NativeWrapper.cs" />
     <Compile Include="Injection\Squirrel\SquirrelFunctions.cs" />
+    <Compile Include="Injection\Squirrel\SquirrelHelper.cs" />
     <Compile Include="Injection\Squirrel\SquirrelInjectorPlugin.cs" />
+    <Compile Include="Log\DefaultLogger.cs" />
+    <Compile Include="Log\ILogger.cs" />
+    <Compile Include="Log\LoggerManager.cs" />
     <Compile Include="PluginLoader.cs" />
     <Compile Include="Plugins.cs" />
     <Compile Include="UtilsClass.cs" />

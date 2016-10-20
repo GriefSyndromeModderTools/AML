@@ -16,6 +16,11 @@ namespace PluginUtils.Injection.Native
             EBP,
         }
 
+        public NativeWrapper()
+        {
+            Log.LoggerManager.NativeInjectorCreated(this);
+        }
+
         public class NativeEnvironment
         {
             private readonly NativeWrapper _Parent;
@@ -165,6 +170,8 @@ namespace PluginUtils.Injection.Native
             }
 
             WritePointer(addrFunctionPointer, pCode);
+
+            Log.LoggerManager.NativeInjectorInjectedDelegate(addrFunctionPointer, typeof(T));
 
             return ret;
         }

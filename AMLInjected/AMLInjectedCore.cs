@@ -1,5 +1,4 @@
-﻿//using PluginUtils;
-using RGiesecke.DllExport;
+﻿using RGiesecke.DllExport;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,17 +10,15 @@ using System.Windows.Forms;
 
 namespace AMLInjected
 {
+    //Be careful when modifying this class.
+    //It CANNOT directly reference class in PluginUtils project, or loading will fail.
     public class AMLInjectedCore
     {
         [DllExport("loadcore")]
         public static uint LoadCore(IntPtr ud)
         {
-            System.Windows.Forms.MessageBox.Show("core loaded");
-
-            var codeBase = typeof(AMLInjectedCore).Assembly.CodeBase;
-            var uri = new UriBuilder(codeBase);
-            var path = Uri.UnescapeDataString(uri.Path);
-            var dir = Path.GetDirectoryName(path);
+            var uri = new UriBuilder(typeof(AMLInjectedCore).Assembly.CodeBase).Path;
+            var dir = Path.GetDirectoryName(Uri.UnescapeDataString(uri));
             var dllFiles = Directory.EnumerateFiles(Path.Combine(dir, "../mods"), "*.dll",
                 SearchOption.TopDirectoryOnly);
 
@@ -54,11 +51,9 @@ namespace AMLInjected
                 {
                     continue;
                 }
-                MessageBox.Show("Loading " + file);
 
                 try
                 {
-                    var libname = Path.GetFileNameWithoutExtension(lib);
                     var assembly = Assembly.LoadFile(file);
                     var types = assembly.GetTypes();
 
@@ -68,7 +63,7 @@ namespace AMLInjected
                         PluginLoader.LoadPlugin(plugin.GetConstructor(Type.EmptyTypes).Invoke(new object[0]));
                     }
 
-                    MessageBox.Show("Loaded " + file);
+                    LogHelper.LoadedLibrary(assembly);
                 }
                 catch (Exception e)
                 {
@@ -78,7 +73,7 @@ namespace AMLInjected
 
             PluginLoader.FinishLoadPlugin();
 
-            MessageBox.Show("core loaded");
+            LogHelper.System("Core loaded");
             return 0;
         }
     }
