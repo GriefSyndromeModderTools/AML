@@ -44,7 +44,6 @@
     <Compile Include="Core\Common\InputHandler.cs" />
     <Compile Include="Core\Common\WindowsHelper.cs" />
     <Compile Include="Core\FP\FPCode.cs" />
-    <Compile Include="Core\FP\FPPlugin.cs" />
     <Compile Include="Core\GSO\GSOHelper.cs" />
     <Compile Include="Core\GSO\NetworkListener.cs" />
     <Compile Include="Core\GSO\NetworkListenerForm.cs">
