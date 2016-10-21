@@ -44,6 +44,10 @@
     <Compile Include="IAMLPluginManager.cs" />
     <Compile Include="Injection\Direct3D\Direct3DHelper.cs" />
     <Compile Include="Injection\Direct3D\Direct3DInjectorPlugin.cs" />
+    <Compile Include="Injection\File\FileAPIInjectorPlugin.cs" />
+    <Compile Include="Injection\File\IFileProxy.cs" />
+    <Compile Include="Injection\File\FileReplacement.cs" />
+    <Compile Include="Injection\File\SimpleReplacementFileProxy.cs" />
     <Compile Include="Injection\Native\AddressHelper.cs" />
     <Compile Include="Injection\Native\AssemblyCodeStorage.cs" />
     <Compile Include="Injection\Native\NativeEntrance.cs" />

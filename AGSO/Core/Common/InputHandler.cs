@@ -11,13 +11,19 @@ namespace AGSO.Core.Common
     {
         private static ushort[] _Rep;
         private static int _RepOffset = 3 * 0;
-        private static bool _Use2P;
 
         static InputHandler()
         {
-            AGSO.Misc.GSO2ReplayFile rep = new Misc.GSO2ReplayFile(
-                @"E:\Games\[game]GRIEFSYNDROME\griefsyndrome\replay\20161006_234348.rep");
-            _Rep = rep.InputData;
+            try
+            {
+                AGSO.Misc.GSO2ReplayFile rep = new Misc.GSO2ReplayFile(
+                    @"E:\Games\[game]GRIEFSYNDROME\griefsyndrome\replay\20161006_234348.rep");
+                _Rep = rep.InputData;
+            }
+            catch
+            {
+                _Rep = new ushort[0];
+            }
 
             var keyconfigData = System.IO.File.ReadAllBytes(
                 @"E:\Games\[game]GRIEFSYNDROME\griefsyndrome\keyconfig.dat");
@@ -37,17 +43,16 @@ namespace AGSO.Core.Common
             {
                 AGSO.Core.FP.FPCode.Run();
             }
+            if (_RepOffset >= _Rep.Length)
+            {
+                return;
+            }
             if (_RepOffset >= 0)
             {
                 for (int p = 0; p < 3; p++)
                 {
                     int playerOffset = _RepOffset + p;
                     var pp = p;
-                    if (_Use2P && pp != 2) pp = 1 - pp;
-                    if (pp == 1)
-                    {
-                        playerOffset -= 0;
-                    }
                     for (int k = 0; k < 9; ++k)
                     {
                         var dik = _KeyConfig[pp * 9 + k];
