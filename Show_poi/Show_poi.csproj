@@ -1,15 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4449F2C7-FA11-4928-9542-86A2606D9CAB}</ProjectGuid>
+    <ProjectGuid>{F6D4204F-ADD6-4509-8DD9-F924ADFCC6F0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AGSO</RootNamespace>
-    <AssemblyName>AGSO</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <RootNamespace>Show_poi</RootNamespace>
+    <AssemblyName>Show_poi</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -38,22 +38,17 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\Common\InputHandler.cs" />
-    <Compile Include="Core\FP\FPCode.cs" />
-    <Compile Include="Core\GSO\GSOHelper.cs" />
-    <Compile Include="Core\GSO\NetworkListener.cs" />
-    <Compile Include="Core\GSO\NetworkListenerForm.cs">
+    <Compile Include="Class1.cs" />
+    <Compile Include="MessagePoi.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Core\GSO\NetworkListenerForm.Designer.cs">
-      <DependentUpon>NetworkListenerForm.cs</DependentUpon>
+    <Compile Include="MessagePoi.Designer.cs">
+      <DependentUpon>MessagePoi.cs</DependentUpon>
     </Compile>
-    <Compile Include="Core\Input\InputInjectorPlugin.cs" />
-    <Compile Include="Misc\GameWindowTitleFix.cs" />
-    <Compile Include="Misc\GSO2ReplayFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -63,12 +58,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Core\Connection\" />
-    <Folder Include="Core\Render\" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Core\GSO\NetworkListenerForm.resx">
-      <DependentUpon>NetworkListenerForm.cs</DependentUpon>
+    <EmbeddedResource Include="MessagePoi.resx">
+      <DependentUpon>MessagePoi.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
