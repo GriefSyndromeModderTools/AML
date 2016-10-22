@@ -49,31 +49,25 @@ namespace AGSO.Core.Common
                 _FPRunFlag = true;
                 AGSO.Core.FP.FPCode.Run();
             }
-            if (_RepOffset >= _Rep.Length)
+            if (_RepOffset + 2 >= _Rep.Length)
             {
+                System.Windows.Forms.MessageBox.Show("Replay ends.");
                 return;
             }
-            if (_RepOffset >= 0)
+            for (int p = 0; p < 3; p++)
             {
-                for (int p = 0; p < 3; p++)
+                int playerOffset = _RepOffset + p;
+                var pp = p;
+                for (int k = 0; k < 9; ++k)
                 {
-                    int playerOffset = _RepOffset + p;
-                    var pp = p;
-                    for (int k = 0; k < 9; ++k)
+                    var dik = _KeyConfig[pp * 9 + k];
+                    if ((_Rep[playerOffset] & _Mask[k]) != 0)
                     {
-                        var dik = _KeyConfig[pp * 9 + k];
-                        if ((_Rep[playerOffset] & _Mask[k]) != 0)
-                        {
-                            if (Marshal.ReadByte(data, dik) != 0)
-                            {
-
-                            }
-                            Marshal.WriteByte(data, dik, 0x80);
-                        }
-                        else
-                        {
-                            //Marshal.WriteByte(data, dik, 0x00);
-                        }
+                        Marshal.WriteByte(data, dik, 0x80);
+                    }
+                    else
+                    {
+                        //Marshal.WriteByte(data, dik, 0x00);
                     }
                 }
             }

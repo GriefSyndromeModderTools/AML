@@ -64,6 +64,7 @@
     <Compile Include="Plugins.cs" />
     <Compile Include="UtilsClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WindowsHelper.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
