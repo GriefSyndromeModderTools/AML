@@ -32,6 +32,7 @@ namespace AGSO.Core.Common
                 {
                     a();
                 }
+                Thread.Sleep(10);
             }
         }
 

@@ -56,6 +56,7 @@ namespace RenderOffset
 
             protected override void Triggered(NativeWrapper.NativeEnvironment env)
             {
+                System.Windows.Forms.MessageBox.Show("draw");
                 var p0 = env.GetParameterP(0);
                 var p1 = env.GetParameterI(1);
                 var p2 = env.GetParameterI(2);

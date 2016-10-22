@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PluginUtils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -11,22 +12,26 @@ namespace AGSO.Core.Common
     {
         private static ushort[] _Rep;
         private static int _RepOffset = 3 * 0;
+        private static bool _FPRunFlag = false;
 
         static InputHandler()
         {
+            _Rep = new ushort[0];
             try
             {
-                AGSO.Misc.GSO2ReplayFile rep = new Misc.GSO2ReplayFile(
-                    @"E:\Games\[game]GRIEFSYNDROME\griefsyndrome\replay\20161006_234348.rep");
-                _Rep = rep.InputData;
+                var dialog = new System.Windows.Forms.OpenFileDialog();
+                if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.Cancel)
+                {
+                    AGSO.Misc.GSO2ReplayFile rep = new Misc.GSO2ReplayFile(dialog.FileName);
+                    _Rep = rep.InputData;
+                }
             }
             catch
             {
-                _Rep = new ushort[0];
+                System.Windows.Forms.MessageBox.Show("Replay error");
             }
 
-            var keyconfigData = System.IO.File.ReadAllBytes(
-                @"E:\Games\[game]GRIEFSYNDROME\griefsyndrome\keyconfig.dat");
+            var keyconfigData = System.IO.File.ReadAllBytes(PathHelper.GetPath("keyconfig.dat"));
             _KeyConfig = new int[9 * 3];
             Buffer.BlockCopy(keyconfigData, 0, _KeyConfig, 0, 9 * 3 * 4);
         }
@@ -39,8 +44,9 @@ namespace AGSO.Core.Common
 
         public static void Aquire(IntPtr data)
         {
-            if (_RepOffset == 0)
+            if (!_FPRunFlag)
             {
+                _FPRunFlag = true;
                 AGSO.Core.FP.FPCode.Run();
             }
             if (_RepOffset >= _Rep.Length)

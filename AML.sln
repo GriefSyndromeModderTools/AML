@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AGSO", "AGSO\AGSO.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RenderOffset", "RenderOffset\RenderOffset.csproj", "{66D915C7-F912-4105-B031-9B4C97E84160}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FramerateCtrl", "FramerateCtrl\FramerateCtrl.csproj", "{0BE717E5-F816-4E97-A2DE-2B8D4C785BB9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,6 +107,18 @@ Global
 		{66D915C7-F912-4105-B031-9B4C97E84160}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{66D915C7-F912-4105-B031-9B4C97E84160}.Release|Win32.ActiveCfg = Release|Any CPU
 		{66D915C7-F912-4105-B031-9B4C97E84160}.Release|x86.ActiveCfg = Release|Any CPU
+		{0BE717E5-F816-4E97-A2DE-2B8D4C785BB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BE717E5-F816-4E97-A2DE-2B8D4C785BB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BE717E5-F816-4E97-A2DE-2B8D4C785BB9}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{0BE717E5-F816-4E97-A2DE-2B8D4C785BB9}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{0BE717E5-F816-4E97-A2DE-2B8D4C785BB9}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{0BE717E5-F816-4E97-A2DE-2B8D4C785BB9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0BE717E5-F816-4E97-A2DE-2B8D4C785BB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BE717E5-F816-4E97-A2DE-2B8D4C785BB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BE717E5-F816-4E97-A2DE-2B8D4C785BB9}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{0BE717E5-F816-4E97-A2DE-2B8D4C785BB9}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{0BE717E5-F816-4E97-A2DE-2B8D4C785BB9}.Release|Win32.ActiveCfg = Release|Any CPU
+		{0BE717E5-F816-4E97-A2DE-2B8D4C785BB9}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

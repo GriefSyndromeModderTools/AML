@@ -18,7 +18,6 @@ namespace AGSO.Core.Input
 
         public void Load()
         {
-            //this code depend on sq plugin
             System.Windows.Forms.MessageBox.Show("debug0");
         }
 
@@ -122,13 +121,16 @@ namespace AGSO.Core.Input
                 var p2 = env.GetParameterP(2);
 
                 Marshal.Copy(_Zero, 0, p2, p1);
-                var ret = _Original(p0, p1, p2);
-                env.SetReturnValue(ret);
 
                 if (p0 == _InjectedInstance)
                 {
                     Common.InputHandler.Aquire(p2);
                     env.SetReturnValue(0);
+                }
+                else
+                {
+                    var ret = _Original(p0, p1, p2);
+                    env.SetReturnValue(ret);
                 }
             }
 

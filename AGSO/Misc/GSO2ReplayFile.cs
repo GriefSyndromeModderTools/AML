@@ -46,14 +46,14 @@ namespace AGSO.Misc
 
             if ((length % 3) != 0)
             {
-                throw new FileFormatException("invalid file length");
+                //throw new FileFormatException("invalid file length");
             }
 
             BaseLap = (int)baseLap;
 
             InputData = new UInt16[length];
             Buffer.BlockCopy(data, 16, InputData, 0, (int)length * 2);
-
+            return;
             int chatOffset = 16 + (int)length * 2;
             ChatMessages = new ChatMessage[chat];
 

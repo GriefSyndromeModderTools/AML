@@ -59,6 +59,7 @@
     <Compile Include="Log\DefaultLogger.cs" />
     <Compile Include="Log\ILogger.cs" />
     <Compile Include="Log\LoggerManager.cs" />
+    <Compile Include="PathHelper.cs" />
     <Compile Include="PluginLoader.cs" />
     <Compile Include="Plugins.cs" />
     <Compile Include="UtilsClass.cs" />
