@@ -12,6 +12,8 @@ namespace PluginUtils.Injection.Squirrel
 
     public class SquirrelHelper
     {
+        private static List<SquirrelFuncDelegate> _DelegateRef = new List<SquirrelFuncDelegate>();
+
         public static void RegisterGlobalFunction(string name, SquirrelFuncDelegate func)
         {
             var pVM = SquirrelInjectorPlugin.SquirrelVM;
@@ -21,6 +23,7 @@ namespace PluginUtils.Injection.Squirrel
             }
             else
             {
+                _DelegateRef.Add(func);
                 IntPtr pFunc = Marshal.GetFunctionPointerForDelegate(func);
                 SquirrelFunctions.pushroottable(pVM);
                 SquirrelFunctions.pushstring(pVM, name, -1);
