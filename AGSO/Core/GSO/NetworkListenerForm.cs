@@ -19,19 +19,16 @@ namespace AGSO.Core.GSO
 
         public void Append(string type, string data)
         {
-            if (InvokeRequired)
+            PluginUtils.WindowsHelper.Run(delegate()
             {
-                this.Invoke((Action)delegate()
+                var item = new ListViewItem(new[] { type, data });
+                listView1.Items.Add(item);
+                if (listView1.Items.Count > 50)
                 {
-                    var item = new ListViewItem(new[] { type, data });
-                    listView1.Items.Add(item);
-                    if (listView1.Items.Count > 50)
-                    {
-                        listView1.Items.RemoveAt(0);
-                    }
-                    item.EnsureVisible();
-                });
-            }
+                    listView1.Items.RemoveAt(0);
+                }
+                item.EnsureVisible();
+            });
         }
 
         private void NetworkListenerForm_FormClosing(object sender, FormClosingEventArgs e)

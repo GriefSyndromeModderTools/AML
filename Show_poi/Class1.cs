@@ -12,8 +12,8 @@ namespace Show_poi
 {
     public class Class1 : IAMLPlugin
     {
-        private static int type_poi; //信息类型
-        private static int value_poi; //信息的值
+        //private static int type_poi; //信息类型
+        //private static int value_poi; //信息的值
         private static MessagePoi text_poi; //窗口对象
 
         public void Init()
@@ -41,7 +41,10 @@ namespace Show_poi
 
         public static void ShowMessagePoi(int a, int b)
         {
-            text_poi.textBox1.AppendText("poi " + a + " " + b + "\n");
+            WindowsHelper.Run(delegate()
+            {
+                text_poi.textBox1.AppendText("poi " + a + " " + b + "\n");
+            });
         }
     }
 }

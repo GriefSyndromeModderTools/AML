@@ -53,9 +53,6 @@ namespace PluginUtils.Injection.Squirrel
         public delegate int Delegate_PIoF_I(IntPtr arg1, int arg2, out float arg3);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate int Delegate_PIoS_I(IntPtr arg1, int arg2, [MarshalAs(UnmanagedType.LPStr)]out string arg3);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int Delegate_PIoP_I(IntPtr arg1, int arg2, out IntPtr arg3);
 
         public static Delegate_P_V pushroottable = GetFunction<Delegate_P_V>(0x12B930);
@@ -69,7 +66,7 @@ namespace PluginUtils.Injection.Squirrel
         public static Delegate_PIoI_I getinteger = GetFunction<Delegate_PIoI_I>(0x12BA90);
         public static Delegate_PIoF_I getfloat = GetFunction<Delegate_PIoF_I>(0x12BAF0);
         public static Delegate_PIoI_I getbool = GetFunction<Delegate_PIoI_I>(0x12BB50);
-        public static Delegate_PIoS_I getstring = GetFunction<Delegate_PIoS_I>(0x12BB90);
+        public static Delegate_PIoP_I getstring_ = GetFunction<Delegate_PIoP_I>(0x12BB90);
         public static Delegate_PIoP_I getuserpointer = GetFunction<Delegate_PIoP_I>(0x12BC40);
 
         public static Delegate_P_I gettop = GetFunction<Delegate_P_I>(0x12BC80);
@@ -90,6 +87,14 @@ namespace PluginUtils.Injection.Squirrel
         private static T GetFunction<T>(uint offset)
         {
             return (T)(object)Marshal.GetDelegateForFunctionPointer(AddressHelper.CodeOffset(offset), typeof(T));
+        }
+
+        public static int getstring(IntPtr vm, int stack, out string str)
+        {
+            IntPtr s;
+            var ret = getstring_(vm, stack, out s);
+            str = Marshal.PtrToStringAnsi(s);
+            return ret;
         }
     }
 }
