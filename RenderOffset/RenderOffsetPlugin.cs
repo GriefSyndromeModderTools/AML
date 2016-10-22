@@ -21,14 +21,14 @@ namespace RenderOffset
             Direct3DHelper.InjectDevice(device => new InjectDrawPrimitiveUP().InjectSelf(device));
         }
 
-        private static IntPtr _IntBuffer = Marshal.AllocHGlobal(4);
         private static float _OffsetX, _OffsetY;
         public static int SetDXOffsetKuma(IntPtr p)
         {
-            SquirrelFunctions.getinteger(p, 2, _IntBuffer);
-            _OffsetX = (float)Marshal.ReadInt32(_IntBuffer);
-            SquirrelFunctions.getinteger(p, 3, _IntBuffer);
-            _OffsetY = (float)Marshal.ReadInt32(_IntBuffer);
+            int x, y;
+            SquirrelFunctions.getinteger(p, 2, out x);
+            SquirrelFunctions.getinteger(p, 3, out y);
+            _OffsetX = (float)x;
+            _OffsetY = (float)y;
             return 0;
         }
 

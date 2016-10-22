@@ -12,7 +12,6 @@ namespace Show_poi
 {
     public class Class1 : IAMLPlugin
     {
-        private static IntPtr _IntBuffer = Marshal.AllocHGlobal(4);
         private static int type_poi; //信息类型
         private static int value_poi; //信息的值
         private static MessagePoi text_poi; //窗口对象
@@ -23,8 +22,7 @@ namespace Show_poi
             PluginUtils.WindowsHelper.Run(delegate ()
             {
                 text_poi = new MessagePoi();
-                //text_poi.Show();
-                new System.Windows.Forms.Form().Show();
+                text_poi.Show();
             });
         }
 
@@ -34,17 +32,16 @@ namespace Show_poi
 
         public static int GetMessagePoi(IntPtr p)
         {
-            SquirrelFunctions.getinteger(p, 2, _IntBuffer);
-            type_poi = Marshal.ReadInt32(_IntBuffer);
-            SquirrelFunctions.getinteger(p, 3, _IntBuffer);
-            value_poi = Marshal.ReadInt32(_IntBuffer);
-            ShowMessagePoi();
+            int a, b;
+            SquirrelFunctions.getinteger(p, 2, out a);
+            SquirrelFunctions.getinteger(p, 3, out b);
+            ShowMessagePoi(a, b);
             return 0;
         }
 
-        public static void ShowMessagePoi()
+        public static void ShowMessagePoi(int a, int b)
         {
-            text_poi.textBox1.AppendText("poi " + type_poi + " " + value_poi + "\n");
+            text_poi.textBox1.AppendText("poi " + a + " " + b + "\n");
         }
     }
 }
