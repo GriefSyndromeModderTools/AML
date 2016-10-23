@@ -24,6 +24,10 @@ namespace Show_poi
                 text_poi = new MessagePoi();
                 text_poi.Show();
             });
+            SquirrelHelper.InjectCompileFile("data/script/hit.nut", "OnHitActor").AddAfter(vm =>
+            {
+                ShowMessagePoi(0, 0);
+            });
         }
 
         public void Load()

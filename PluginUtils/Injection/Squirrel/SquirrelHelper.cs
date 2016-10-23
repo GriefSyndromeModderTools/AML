@@ -12,6 +12,9 @@ namespace PluginUtils.Injection.Squirrel
 
     public class SquirrelHelper
     {
+        public static IntPtr SquirrelVM { get { return SquirrelInjectorPlugin.SquirrelVM; } }
+
+        //prevent GC collecting
         private static List<SquirrelFuncDelegate> _DelegateRef = new List<SquirrelFuncDelegate>();
 
         public static void RegisterGlobalFunction(string name, SquirrelFuncDelegate func)
@@ -31,6 +34,11 @@ namespace PluginUtils.Injection.Squirrel
                 SquirrelFunctions.newslot(pVM, -3, 0);
                 SquirrelFunctions.pop(pVM, 1);
             }
+        }
+
+        public static InjectedScriptFunction InjectCompileFile(string script, string func)
+        {
+            return CompileFileInjectionManager.InjectCompileFile(script, func);
         }
     }
 }

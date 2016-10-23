@@ -38,6 +38,9 @@ namespace PluginUtils.Injection.Squirrel
         public delegate int Delegate_PIP_I(IntPtr arg1, int arg2, IntPtr arg3);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void Delegate_PII_V(IntPtr arg1, int arg2, int arg3);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void Delegate_PPI_V(IntPtr arg1, IntPtr arg2, int arg3);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -77,6 +80,10 @@ namespace PluginUtils.Injection.Squirrel
 
         public static Delegate_PII_I newslot = GetFunction<Delegate_PII_I>(0x12DBC0);
         public static Delegate_PII_I deleteslot = GetFunction<Delegate_PII_I>(0x12DC80);
+        public static Delegate_PI_I rawget = GetFunction<Delegate_PI_I>(0x12E030);
+
+        public static Delegate_PIP_I getstackobj = GetFunction<Delegate_PIP_I>(0x12BDA0);
+        public static Delegate_PII_V pushobject_ = GetFunction<Delegate_PII_V>(0x12BDF0);
 
         public static Delegate_PPI_V newclosure = GetFunction<Delegate_PPI_V>(0x12EA10);
         public static Delegate_P_V newtable = GetFunction<Delegate_P_V>(0x12B8C0);
@@ -95,6 +102,15 @@ namespace PluginUtils.Injection.Squirrel
             var ret = getstring_(vm, stack, out s);
             str = Marshal.PtrToStringAnsi(s);
             return ret;
+        }
+
+        //original function require a 8 byte object
+        //this function use the pointer of the object and send it to original function
+        public static void pushobject(IntPtr vm, IntPtr pObj)
+        {
+            int i1 = Marshal.ReadInt32(pObj);
+            int i2 = Marshal.ReadInt32(pObj, 4);
+            pushobject_(vm, i1, i2);
         }
     }
 }

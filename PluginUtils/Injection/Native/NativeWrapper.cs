@@ -82,6 +82,7 @@ namespace PluginUtils.Injection.Native
             _RegisterIndex[ir] = _Count++;
         }
 
+        //TODO moved should go after injected code. modify InjectGSOLoaded when fixed.
         public void Inject(IntPtr addr, int len)
         {
             if (len < 6)

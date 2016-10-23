@@ -38,6 +38,7 @@ namespace PluginUtils.Injection.Squirrel
 
             protected override void Triggered(NativeWrapper.NativeEnvironment env)
             {
+                MessageBox.Show("sq init");
                 var pVM = env.GetRegister(Register.EAX);
                 SquirrelVM = pVM;
 

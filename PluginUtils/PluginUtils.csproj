@@ -53,6 +53,10 @@
     <Compile Include="Injection\Native\NativeEntrance.cs" />
     <Compile Include="Injection\Native\NativeFunctions.cs" />
     <Compile Include="Injection\Native\NativeWrapper.cs" />
+    <Compile Include="Injection\Squirrel\CompileFileInjectionManager.cs" />
+    <Compile Include="Injection\Squirrel\CompileFileInjectorPlugin.cs" />
+    <Compile Include="Injection\Squirrel\InjectedScriptFunction.cs" />
+    <Compile Include="Injection\Squirrel\NativeClosureFixCode.cs" />
     <Compile Include="Injection\Squirrel\SquirrelFunctions.cs" />
     <Compile Include="Injection\Squirrel\SquirrelHelper.cs" />
     <Compile Include="Injection\Squirrel\SquirrelInjectorPlugin.cs" />
