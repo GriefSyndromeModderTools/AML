@@ -37,7 +37,6 @@ namespace TestMod
 
         public void Load()
         {
-            throw new NotImplementedException();
         }
     }
 }
