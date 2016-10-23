@@ -10,10 +10,8 @@ using System.Threading.Tasks;
 
 namespace FramerateCtrl
 {
-    //better: modify +0xC616A (call eax) to (nop nop)
-    //other improvements: remove playse, BitBlt, SetBlend, StretchBlt
-    //+2AC11D -> (byte)0
-    public class DirectXInjectorPlugin : IAMLPlugin
+    //much better is achieved by simply remove rendering code
+    public class DirectXInjectorPlugin // : IAMLPlugin
     {
         private static IntPtr _SwapChain;
 

@@ -8,51 +8,21 @@ using System.Threading.Tasks;
 
 namespace PluginUtils.Injection.Squirrel
 {
-    //griefsyndrome can not directly run callbacks
+    //fix griefsyndrome can not directly run native callbacks
     class NativeClosureFixCode : IAMLPlugin
     {
-        //TODO move this to public api
-        [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern bool VirtualProtect(IntPtr lpAddress, uint dwSize,
-           Protection flNewProtect, out Protection lpflOldProtect);
-
-        public enum Protection
-        {
-            PAGE_NOACCESS = 0x01,
-            PAGE_READONLY = 0x02,
-            PAGE_READWRITE = 0x04,
-            PAGE_WRITECOPY = 0x08,
-            PAGE_EXECUTE = 0x10,
-            PAGE_EXECUTE_READ = 0x20,
-            PAGE_EXECUTE_READWRITE = 0x40,
-            PAGE_EXECUTE_WRITECOPY = 0x80,
-            PAGE_GUARD = 0x100,
-            PAGE_NOCACHE = 0x200,
-            PAGE_WRITECOMBINE = 0x400
-        }
-
         public void Init()
         {
-            Protection oldP;
             {
-                //World2D.SetXXXXFunction
-                //+5615 -> nop nop
-                var code = AddressHelper.CodeOffset(0x5615);
-                VirtualProtect(code, 2, Protection.PAGE_EXECUTE_READWRITE, out oldP);
-                Marshal.WriteByte(code, 0x90);
-                Marshal.WriteByte(code, 1, 0x90);
-            }
-            {
-                //World2D.SetXXXXFunction
-                //+5615 -> nop nop
-                var code = AddressHelper.CodeOffset(0x2DA3);
-                VirtualProtect(code, 2, Protection.PAGE_EXECUTE_READWRITE, out oldP);
-                Marshal.WriteByte(code, 0x90);
-                Marshal.WriteByte(code, 1, 0x90);
-            }
-            {
-                //game may crashe while exiting due to sq hack, just terminate the process
-                new InjectTerminateWhenCrash().InjectSelf();
+                //World2D.SetXXXXFunction and CreateActor
+                //old:
+                //  cmp dword [eax], 0x08000100
+                //  jne ...
+                //new:
+                //  test dword [eax], 0x00000300
+                //  jz ...
+                CodeModification.Modify(0x560F, 0xF7, 0x00, 0x00, 0x03, 0x00, 0x00, 0x74);
+                CodeModification.Modify(0x2D9D, 0xF7, 0x00, 0x00, 0x03, 0x00, 0x00, 0x74);
             }
         }
 
@@ -60,6 +30,7 @@ namespace PluginUtils.Injection.Squirrel
         {
         }
 
+        //hacking sq no longer cause crash so this is not used now
         private class InjectTerminateWhenCrash : NativeWrapper
         {
             private delegate void PostQuitMessageDelegate(int a);

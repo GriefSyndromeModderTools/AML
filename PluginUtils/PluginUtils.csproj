@@ -50,6 +50,7 @@
     <Compile Include="Injection\File\SimpleReplacementFileProxy.cs" />
     <Compile Include="Injection\Native\AddressHelper.cs" />
     <Compile Include="Injection\Native\AssemblyCodeStorage.cs" />
+    <Compile Include="Injection\Native\CodeModification.cs" />
     <Compile Include="Injection\Native\NativeEntrance.cs" />
     <Compile Include="Injection\Native\NativeFunctions.cs" />
     <Compile Include="Injection\Native\NativeWrapper.cs" />
