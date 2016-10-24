@@ -39,14 +39,14 @@
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(528, 321);
+            this.textBox1.Size = new System.Drawing.Size(571, 447);
             this.textBox1.TabIndex = 0;
             // 
             // MessagePoi
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(534, 326);
+            this.ClientSize = new System.Drawing.Size(576, 454);
             this.Controls.Add(this.textBox1);
             this.Name = "MessagePoi";
             this.Text = "MessagePoi";
