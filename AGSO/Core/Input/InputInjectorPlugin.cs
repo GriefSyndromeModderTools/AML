@@ -147,7 +147,7 @@ namespace AGSO.Core.Input
 
                 Marshal.Copy(_Zero, 0, p2, p1);
 
-                if (p0 == _InjectedInstance)
+                if (p0 == _InjectedInstance && InputHandler.ReplayLoaded)
                 {
                     Common.InputHandler.Aquire(p2);
                     env.SetReturnValue(0);
