@@ -26,19 +26,10 @@ namespace TestMod
                 SquirrelFunctions.pop(vm, 2);
                 //use lap
             });
-            FileReplacement.RegisterFile(Path.GetFullPath("keyconfig.dat"), new KeyConfigFile());
         }
 
         public void Load()
         {
-        }
-
-        private class KeyConfigFile : CachedModificationFileProxyFactory
-        {
-            public override byte[] Modify(byte[] data)
-            {
-                return data;
-            }
         }
     }
 }
