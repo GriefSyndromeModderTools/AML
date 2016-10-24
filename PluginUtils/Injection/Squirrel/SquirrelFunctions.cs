@@ -84,7 +84,10 @@ namespace PluginUtils.Injection.Squirrel
 
         public static Delegate_PII_I newslot = GetFunction<Delegate_PII_I>(0x12DBC0);
         public static Delegate_PII_I deleteslot = GetFunction<Delegate_PII_I>(0x12DC80);
+        public static Delegate_PI_I next = GetFunction<Delegate_PI_I>(0x12C840);
+        public static Delegate_PII_I rawdeleteslot = GetFunction<Delegate_PII_I>(0x12BCE0);
         public static Delegate_PI_I rawget = GetFunction<Delegate_PI_I>(0x12E030);
+        public static Delegate_PI_I rawset = GetFunction<Delegate_PI_I>(0x12DD80);
 
         public static Delegate_PIP_I getstackobj = GetFunction<Delegate_PIP_I>(0x12BDA0);
         public static Delegate_PII_V pushobject_ = GetFunction<Delegate_PII_V>(0x12BDF0);

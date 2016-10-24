@@ -9,7 +9,7 @@ using SysFile = System.IO.File;
 
 namespace PluginUtils.Injection.File
 {
-    class FileReplacement
+    public class FileReplacement
     {
         private static Dictionary<string, IFileProxyFactory> _FactoryList = new Dictionary<string, IFileProxyFactory>();
         private static Dictionary<int, IFileProxy> _ActiveFiles = new Dictionary<int, IFileProxy>();
@@ -29,7 +29,7 @@ namespace PluginUtils.Injection.File
             IFileProxyFactory fac;
             if (_FactoryList.TryGetValue(fullPath, out fac))
             {
-                _ActiveFiles.Add(handle, fac.Create());
+                _ActiveFiles.Add(handle, fac.Create(fullPath));
             }
         }
 
@@ -60,6 +60,11 @@ namespace PluginUtils.Injection.File
             }
             ret = 0;
             return false;
+        }
+
+        internal static void CloseHandle(int handle)
+        {
+            _ActiveFiles.Remove(handle);
         }
     }
 }
