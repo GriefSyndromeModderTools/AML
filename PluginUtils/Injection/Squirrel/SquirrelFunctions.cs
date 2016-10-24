@@ -58,6 +58,10 @@ namespace PluginUtils.Injection.Squirrel
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int Delegate_PIoP_I(IntPtr arg1, int arg2, out IntPtr arg3);
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate int Delegate_PPISI_I(IntPtr arg1, IntPtr arg2, int arg3,
+            [MarshalAs(UnmanagedType.LPStr)]string arg4, int arg5);
+
         public static Delegate_P_V pushroottable = GetFunction<Delegate_P_V>(0x12B930);
         public static Delegate_PSI_V pushstring = GetFunction<Delegate_PSI_V>(0x12B740);
         public static Delegate_PI_V pushinteger = GetFunction<Delegate_PI_V>(0x12B7B0);
@@ -84,12 +88,14 @@ namespace PluginUtils.Injection.Squirrel
 
         public static Delegate_PIP_I getstackobj = GetFunction<Delegate_PIP_I>(0x12BDA0);
         public static Delegate_PII_V pushobject_ = GetFunction<Delegate_PII_V>(0x12BDF0);
+        public static Delegate_PP_V addref = GetFunction<Delegate_PP_V>(0x12B6C0);
 
         public static Delegate_PPI_V newclosure = GetFunction<Delegate_PPI_V>(0x12EA10);
         public static Delegate_P_V newtable = GetFunction<Delegate_P_V>(0x12B8C0);
         public static Delegate_PI_V newarray = GetFunction<Delegate_PI_V>(0x12E930);
 
         public static Delegate_PIII_I call = GetFunction<Delegate_PIII_I>(0x12BEF0);
+        public static Delegate_PPISI_I compilebuffer_ = GetFunction<Delegate_PPISI_I>(0x12E270);
 
         private static T GetFunction<T>(uint offset)
         {
@@ -111,6 +117,21 @@ namespace PluginUtils.Injection.Squirrel
             int i1 = Marshal.ReadInt32(pObj);
             int i2 = Marshal.ReadInt32(pObj, 4);
             pushobject_(vm, i1, i2);
+        }
+
+        public static int compilebuffer(IntPtr vm, string str, string buffername, int raiseerror)
+        {
+            var buffer = Marshal.StringToHGlobalAnsi(str);
+
+            //calculate length
+            //TODO better method?
+            int length = 0;
+            while (Marshal.ReadByte(buffer, length) != 0)
+            {
+                length += 1;
+            }
+
+            return compilebuffer_(vm, buffer, length + 1, buffername, raiseerror);
         }
     }
 }

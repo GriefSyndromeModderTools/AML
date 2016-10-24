@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AMLLoader", "AMLLoader\AMLLoader.csproj", "{EDE87792-8324-4F05-A439-B5567AE1AE59}"
 EndProject
@@ -18,6 +18,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AMLInjected", "AMLInjected\AMLInjected.csproj", "{E06CF776-4696-41D8-874D-7E01B6D001DE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Show_poi", "Show_poi\Show_poi.csproj", "{F6D4204F-ADD6-4509-8DD9-F924ADFCC6F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestMod", "TestMod\TestMod.csproj", "{F3ADAD5B-6024-45EB-A327-AFD770428EBB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -137,6 +139,18 @@ Global
 		{F6D4204F-ADD6-4509-8DD9-F924ADFCC6F0}.Release|Win32.Build.0 = Release|Any CPU
 		{F6D4204F-ADD6-4509-8DD9-F924ADFCC6F0}.Release|x86.ActiveCfg = Release|Any CPU
 		{F6D4204F-ADD6-4509-8DD9-F924ADFCC6F0}.Release|x86.Build.0 = Release|Any CPU
+		{F3ADAD5B-6024-45EB-A327-AFD770428EBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3ADAD5B-6024-45EB-A327-AFD770428EBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3ADAD5B-6024-45EB-A327-AFD770428EBB}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{F3ADAD5B-6024-45EB-A327-AFD770428EBB}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{F3ADAD5B-6024-45EB-A327-AFD770428EBB}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{F3ADAD5B-6024-45EB-A327-AFD770428EBB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F3ADAD5B-6024-45EB-A327-AFD770428EBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3ADAD5B-6024-45EB-A327-AFD770428EBB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3ADAD5B-6024-45EB-A327-AFD770428EBB}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{F3ADAD5B-6024-45EB-A327-AFD770428EBB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{F3ADAD5B-6024-45EB-A327-AFD770428EBB}.Release|Win32.ActiveCfg = Release|Any CPU
+		{F3ADAD5B-6024-45EB-A327-AFD770428EBB}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
