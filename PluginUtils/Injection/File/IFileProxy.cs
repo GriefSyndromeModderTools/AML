@@ -8,7 +8,7 @@ namespace PluginUtils.Injection.File
 {
     public interface IFileProxyFactory
     {
-        IFileProxy Create();
+        IFileProxy Create(string fullpath);
     }
 
     public interface IFileProxy

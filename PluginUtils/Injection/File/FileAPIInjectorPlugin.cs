@@ -15,7 +15,7 @@ namespace PluginUtils.Injection.File
             new InjectCreateFile().InjectSelf();
             new InjectReadFile().InjectSelf();
             new InjectSetFilePointer().InjectSelf();
-            //TODO handle close handle
+            new InjectCloseHandle().InjectSelf();
         }
 
         public void Load()
@@ -122,5 +122,30 @@ namespace PluginUtils.Injection.File
                 }
             }
         }
+
+        private class InjectCloseHandle : NativeWrapper
+        {
+            private delegate int CloseHandleDelegate(int handle);
+            private CloseHandleDelegate _Original;
+
+            public InjectCloseHandle()
+            {
+                this.AddRegisterRead(Register.EAX);
+                this.AddRegisterRead(Register.EBP);
+            }
+
+            public void InjectSelf()
+            {
+                _Original = this.InjectFunctionPointer<CloseHandleDelegate>(AddressHelper.CodeOffset(0x20E0BC), 4);
+            }
+
+            protected override void Triggered(NativeWrapper.NativeEnvironment env)
+            {
+                var p0 = env.GetParameterI(0);
+                FileReplacement.CloseHandle(p0);
+                env.SetReturnValue(_Original(p0));
+            }
+        }
+
     }
 }

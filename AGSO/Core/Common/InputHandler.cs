@@ -14,29 +14,30 @@ namespace AGSO.Core.Common
         private static int _RepOffset = 3 * 0;
         private static bool _FPRunFlag = false;
 
-        static InputHandler()
-        {
-            _Rep = new ushort[0];
-            try
-            {
-                var dialog = new System.Windows.Forms.OpenFileDialog();
-                if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.Cancel)
-                {
-                    AGSO.Misc.GSO2ReplayFile rep = new Misc.GSO2ReplayFile(dialog.FileName);
-                    _Rep = rep.InputData;
-                }
-            }
-            catch
-            {
-                System.Windows.Forms.MessageBox.Show("Replay error");
-            }
+        public static bool ReplayLoaded { get { return _Rep != null; } }
 
-            var keyconfigData = System.IO.File.ReadAllBytes(PathHelper.GetPath("keyconfig.dat"));
-            _KeyConfig = new int[9 * 3];
-            Buffer.BlockCopy(keyconfigData, 0, _KeyConfig, 0, 9 * 3 * 4);
+        public static void InitInputHandler()
+        {
+            WindowsHelper.RunAndWait(delegate()
+            {
+                WindowsHelper.MessageBox("before dialog");
+                try
+                {
+                    var dialog = new System.Windows.Forms.OpenFileDialog();
+                    if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.Cancel)
+                    {
+                        AGSO.Misc.GSO2ReplayFile rep = new Misc.GSO2ReplayFile(dialog.FileName);
+                        _Rep = rep.InputData;
+                    }
+                }
+                catch
+                {
+                    System.Windows.Forms.MessageBox.Show("Replay error");
+                }
+            });
         }
 
-        private static int[] _KeyConfig;
+        public static int[] KeyConfig = new int[9 * 3];
 
         private static readonly ushort[] _Mask = new ushort[] {
             0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x100
@@ -49,8 +50,13 @@ namespace AGSO.Core.Common
                 _FPRunFlag = true;
                 AGSO.Core.FP.FPCode.Run();
             }
+            if (_Rep == null)
+            {
+                return;
+            }
             if (_RepOffset + 2 >= _Rep.Length)
             {
+                _Rep = null;
                 System.Windows.Forms.MessageBox.Show("Replay ends.");
                 return;
             }
@@ -60,7 +66,7 @@ namespace AGSO.Core.Common
                 var pp = p;
                 for (int k = 0; k < 9; ++k)
                 {
-                    var dik = _KeyConfig[pp * 9 + k];
+                    var dik = KeyConfig[pp * 9 + k];
                     if ((_Rep[playerOffset] & _Mask[k]) != 0)
                     {
                         Marshal.WriteByte(data, dik, 0x80);

@@ -19,7 +19,13 @@ namespace PluginUtils
         static WindowsHelper()
         {
             _WindowsThread = new Thread(WindowsThreadStart);
+            _WindowsThread.SetApartmentState(ApartmentState.STA);
             _WindowsThread.Start();
+        }
+
+        public static void MessageBox(string text)
+        {
+            System.Windows.Forms.MessageBox.Show(text);
         }
 
         private static void WindowsThreadStart()
@@ -27,18 +33,45 @@ namespace PluginUtils
             Action a;
             while (true)
             {
-                DoEvents();
                 while (_Queue.TryDequeue(out a))
                 {
-                    a();
+                    DoEvents();
+                    a.Invoke();
                 }
                 Thread.Sleep(10);
+                DoEvents();
             }
         }
 
         public static void Run(Action callback)
         {
+            if (Thread.CurrentThread == _WindowsThread)
+            {
+                callback();
+            }
             _Queue.Enqueue(callback);
+        }
+
+        public static void RunAndWait(Action a)
+        {
+            var wait = new Wait { Original = a };
+            Run(wait.Run);
+            while (!wait.Finished)
+            {
+                Thread.Sleep(5);
+            }
+        }
+
+        private class Wait
+        {
+            public volatile bool Finished;
+            public Action Original;
+
+            public void Run()
+            {
+                Original();
+                Finished = true;
+            }
         }
 
         //use the same method as SharpDX

@@ -12,8 +12,9 @@ namespace PluginUtils.Injection.Squirrel
     class SquirrelInjectorPlugin : IAMLPlugin
     {
         public static IntPtr SquirrelVM { get; private set; }
-        public static readonly Dictionary<string, SquirrelFuncDelegate> UnregisteredFunction =
-            new Dictionary<string, SquirrelFuncDelegate>();
+        //public static readonly Dictionary<string, SquirrelFuncDelegate> UnregisteredFunction =
+        //    new Dictionary<string, SquirrelFuncDelegate>();
+        public static event Action<IntPtr> OnSquirrelCreated;
 
         public void Init()
         {
@@ -38,7 +39,6 @@ namespace PluginUtils.Injection.Squirrel
 
             protected override void Triggered(NativeWrapper.NativeEnvironment env)
             {
-                MessageBox.Show("sq init");
                 var pVM = env.GetRegister(Register.EAX);
                 SquirrelVM = pVM;
 
@@ -48,11 +48,17 @@ namespace PluginUtils.Injection.Squirrel
                 SquirrelFunctions.newslot(pVM, -3, 0);
                 SquirrelFunctions.pop(pVM, 1);
 
-                var list = new Dictionary<string, SquirrelFuncDelegate>(UnregisteredFunction);
-                UnregisteredFunction.Clear();
-                foreach (var entry in list)
+                //var list = new Dictionary<string, SquirrelFuncDelegate>(UnregisteredFunction);
+                //UnregisteredFunction.Clear();
+                //foreach (var entry in list)
+                //{
+                //    SquirrelHelper.RegisterGlobalFunction(entry.Key, entry.Value);
+                //}
+
+                if (OnSquirrelCreated != null)
                 {
-                    SquirrelHelper.RegisterGlobalFunction(entry.Key, entry.Value);
+                    OnSquirrelCreated(pVM);
+                    OnSquirrelCreated = null;
                 }
             }
         }
