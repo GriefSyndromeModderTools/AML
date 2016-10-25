@@ -38,7 +38,8 @@ namespace PluginUtils.Injection.Squirrel
 
             public void InjectSelf()
             {
-                this.Inject(AddressHelper.CodeOffset(0xB71E3), 6);
+                this.Inject(AddressHelper.CodeOffset(0xB71E3), 6); //binary
+                this.Inject(AddressHelper.CodeOffset(0xB7300), 6); //text
             }
 
             protected override void Triggered(NativeWrapper.NativeEnvironment env)
@@ -62,7 +63,8 @@ namespace PluginUtils.Injection.Squirrel
 
             public void InjectSelf()
             {
-                this.Inject(AddressHelper.CodeOffset(0xB720B), 11);
+                this.Inject(AddressHelper.CodeOffset(0xB720B), 11); //binary
+                this.Inject(AddressHelper.CodeOffset(0xB7328), 11); //text
             }
 
             protected override void Triggered(NativeWrapper.NativeEnvironment env)
