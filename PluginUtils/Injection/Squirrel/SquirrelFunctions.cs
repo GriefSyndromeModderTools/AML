@@ -71,6 +71,10 @@ namespace PluginUtils.Injection.Squirrel
         public delegate int Delegate_PPISI_I(IntPtr arg1, IntPtr arg2, int arg3,
             [MarshalAs(UnmanagedType.LPStr)]string arg4, int arg5);
 
+        public static Delegate_P_V setdebughook = GetFunction<Delegate_P_V>(0x12B630);
+
+        public static Delegate_PI_V enabledebuginfo = GetFunction<Delegate_PI_V>(0x12B6A0);
+
         public static Delegate_P_V pushroottable = GetFunction<Delegate_P_V>(0x12B930);
         public static Delegate_PSI_V pushstring = GetFunction<Delegate_PSI_V>(0x12B740);
         public static Delegate_PI_V pushinteger = GetFunction<Delegate_PI_V>(0x12B7B0);
@@ -132,19 +136,15 @@ namespace PluginUtils.Injection.Squirrel
             pushobject_(vm, i1, i2);
         }
 
+        [DllImport("kernel32.dll", CharSet = CharSet.Ansi, ExactSpelling = true)]
+        internal static extern int lstrlenA(IntPtr ptr);
+
         public static int compilebuffer(IntPtr vm, string str, string buffername, int raiseerror)
         {
             var buffer = Marshal.StringToHGlobalAnsi(str);
-
-            //calculate length
-            //TODO better method?
-            int length = 0;
-            while (Marshal.ReadByte(buffer, length) != 0)
-            {
-                length += 1;
-            }
-
-            return compilebuffer_(vm, buffer, length + 1, buffername, raiseerror);
+            var ret = compilebuffer_(vm, buffer, lstrlenA(buffer) + 1, buffername, raiseerror);
+            Marshal.FreeHGlobal(buffer);
+            return ret;
         }
     }
 }
