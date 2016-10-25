@@ -13,13 +13,13 @@ namespace PluginUtils.Injection.Squirrel
             new Dictionary<string, Dictionary<string, int>>();
         private static List<InjectedScriptFunction> _FunctionList = new List<InjectedScriptFunction>();
 
-        public static void AfterCompileFile(string file, IntPtr table)
+        public static void AfterCompileFile(string file, ref SquirrelFunctions.SQObject table)
         {
             var vm = SquirrelInjectorPlugin.SquirrelVM;
             Dictionary<string, int> script;
             if (_FunctionDict.TryGetValue(file, out script))
             {
-                SquirrelFunctions.pushobject(vm, table);
+                SquirrelFunctions.pushobject_(vm, table.Type, table.Pointer);
                 ProcessTable(vm, script);
                 SquirrelFunctions.pop(vm, 1);
             }
@@ -95,15 +95,15 @@ namespace PluginUtils.Injection.Squirrel
             }
 
             //TODO make it faster?
-            IntPtr obj = Marshal.AllocHGlobal(8);
-            SquirrelFunctions.getstackobj(vm, -1, obj);
+            //IntPtr obj = Marshal.AllocHGlobal(8);
+            SquirrelFunctions.SQObject obj;
+            SquirrelFunctions.getstackobj(vm, -1, out obj);
 
             //pop the two free vars
             SquirrelFunctions.pop(vm, 2);
 
             var f = _FunctionList[index];
-            return f.Invoke(vm, SquirrelFunctions.gettop(vm),
-                Marshal.ReadInt32(obj), Marshal.ReadInt32(obj, 4));
+            return f.Invoke(vm, SquirrelFunctions.gettop(vm), obj.Type, obj.Pointer);
         }
     }
 }

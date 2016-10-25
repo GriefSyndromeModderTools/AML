@@ -13,7 +13,8 @@ namespace PluginUtils.Injection.Squirrel
     class CompileFileInjectorPlugin : IAMLPlugin
     {
         private static string _LastFile;
-        private static IntPtr _SavedTable = Marshal.AllocHGlobal(8);
+        //private static IntPtr _SavedTable = Marshal.AllocHGlobal(8);
+        private static SquirrelFunctions.SQObject _SavedTable;
 
         public void Init()
         {
@@ -40,7 +41,7 @@ namespace PluginUtils.Injection.Squirrel
 
             protected override void Triggered(NativeWrapper.NativeEnvironment env)
             {
-                if (SquirrelFunctions.getstackobj(SquirrelInjectorPlugin.SquirrelVM, -1, _SavedTable) == 0)
+                if (SquirrelFunctions.getstackobj(SquirrelInjectorPlugin.SquirrelVM, -1, out _SavedTable) == 0)
                 {
                     //only save filename when get table succeeded
                     _LastFile = Marshal.PtrToStringAnsi(env.GetParameterP(0));
@@ -65,7 +66,7 @@ namespace PluginUtils.Injection.Squirrel
             {
                 if (_LastFile != null)
                 {
-                    CompileFileInjectionManager.AfterCompileFile(_LastFile, _SavedTable);
+                    CompileFileInjectionManager.AfterCompileFile(_LastFile, ref _SavedTable);
                     _LastFile = null;
                 }
             }

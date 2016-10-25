@@ -61,7 +61,7 @@ namespace PluginUtils.Injection.Squirrel
             {
                 if (SquirrelFunctions.compilebuffer(vm, code, name, 0) == 0)
                 {
-                    SquirrelFunctions.getstackobj(vm, -1, ret);
+                    SquirrelFunctions.getstackobj_(vm, -1, ret);
                     SquirrelFunctions.addref(vm, ret);
                     SquirrelFunctions.pop(vm, 1);
                 }

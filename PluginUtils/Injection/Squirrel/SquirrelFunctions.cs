@@ -10,6 +10,12 @@ namespace PluginUtils.Injection.Squirrel
 {
     public class SquirrelFunctions
     {
+        public struct SQObject
+        {
+            public int Type;
+            public int Pointer; //TODO make it pointer
+        }
+
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate IntPtr Delegate_I_P(int arg);
 
@@ -36,6 +42,9 @@ namespace PluginUtils.Injection.Squirrel
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int Delegate_PIP_I(IntPtr arg1, int arg2, IntPtr arg3);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate int Delegate_PIpO_I(IntPtr arg1, int arg2, out SQObject arg3);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void Delegate_PII_V(IntPtr arg1, int arg2, int arg3);
@@ -89,7 +98,8 @@ namespace PluginUtils.Injection.Squirrel
         public static Delegate_PI_I rawget = GetFunction<Delegate_PI_I>(0x12E030);
         public static Delegate_PI_I rawset = GetFunction<Delegate_PI_I>(0x12DD80);
 
-        public static Delegate_PIP_I getstackobj = GetFunction<Delegate_PIP_I>(0x12BDA0);
+        public static Delegate_PIP_I getstackobj_ = GetFunction<Delegate_PIP_I>(0x12BDA0);
+        public static Delegate_PIpO_I getstackobj = GetFunction<Delegate_PIpO_I>(0x12BDA0);
         public static Delegate_PII_V pushobject_ = GetFunction<Delegate_PII_V>(0x12BDF0);
         public static Delegate_PP_V addref = GetFunction<Delegate_PP_V>(0x12B6C0);
 
