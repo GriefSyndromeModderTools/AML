@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AMLLoader", "AMLLoader\AMLLoader.csproj", "{EDE87792-8324-4F05-A439-B5567AE1AE59}"
 EndProject
@@ -20,6 +20,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Show_poi", "Show_poi\Show_poi.csproj", "{F6D4204F-ADD6-4509-8DD9-F924ADFCC6F0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestMod", "TestMod\TestMod.csproj", "{F3ADAD5B-6024-45EB-A327-AFD770428EBB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Results_poi", "Results_poi\Results_poi.csproj", "{51A760A9-4891-4881-AE02-47324D52B5BD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -151,6 +153,22 @@ Global
 		{F3ADAD5B-6024-45EB-A327-AFD770428EBB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{F3ADAD5B-6024-45EB-A327-AFD770428EBB}.Release|Win32.ActiveCfg = Release|Any CPU
 		{F3ADAD5B-6024-45EB-A327-AFD770428EBB}.Release|x86.ActiveCfg = Release|Any CPU
+		{51A760A9-4891-4881-AE02-47324D52B5BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51A760A9-4891-4881-AE02-47324D52B5BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51A760A9-4891-4881-AE02-47324D52B5BD}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{51A760A9-4891-4881-AE02-47324D52B5BD}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{51A760A9-4891-4881-AE02-47324D52B5BD}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{51A760A9-4891-4881-AE02-47324D52B5BD}.Debug|Win32.Build.0 = Debug|Any CPU
+		{51A760A9-4891-4881-AE02-47324D52B5BD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{51A760A9-4891-4881-AE02-47324D52B5BD}.Debug|x86.Build.0 = Debug|Any CPU
+		{51A760A9-4891-4881-AE02-47324D52B5BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51A760A9-4891-4881-AE02-47324D52B5BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51A760A9-4891-4881-AE02-47324D52B5BD}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{51A760A9-4891-4881-AE02-47324D52B5BD}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{51A760A9-4891-4881-AE02-47324D52B5BD}.Release|Win32.ActiveCfg = Release|Any CPU
+		{51A760A9-4891-4881-AE02-47324D52B5BD}.Release|Win32.Build.0 = Release|Any CPU
+		{51A760A9-4891-4881-AE02-47324D52B5BD}.Release|x86.ActiveCfg = Release|Any CPU
+		{51A760A9-4891-4881-AE02-47324D52B5BD}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

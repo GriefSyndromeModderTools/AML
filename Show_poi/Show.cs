@@ -121,8 +121,8 @@ namespace Show_poi
         public static int GetMessagePoi(IntPtr p)
         {
             int type = 0, value = 0;
-            SquirrelFunctions.getinteger(p, type, out value);
-            SquirrelFunctions.getinteger(p, value, out type);
+            SquirrelFunctions.getinteger(p, 3, out value);
+            SquirrelFunctions.getinteger(p, 2, out type);
             ShowMessagePoi(type, value);
             return 0;
         }
