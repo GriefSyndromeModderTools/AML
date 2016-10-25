@@ -9,12 +9,14 @@ using System.Threading.Tasks;
 namespace PluginUtils.Injection.Squirrel
 {
     //TODO 1 sq text code will not trigger
-    //TODO 2 handle compile stack correctly
     class CompileFileInjectorPlugin : IAMLPlugin
     {
-        private static string _LastFile;
-        //private static IntPtr _SavedTable = Marshal.AllocHGlobal(8);
-        private static SquirrelFunctions.SQObject _SavedTable;
+        private struct CompileFileCall
+        {
+            public SquirrelFunctions.SQObject Table;
+            public string FileName;
+        }
+        private static Stack<CompileFileCall> _CallStack = new Stack<CompileFileCall>();
 
         public void Init()
         {
@@ -41,10 +43,11 @@ namespace PluginUtils.Injection.Squirrel
 
             protected override void Triggered(NativeWrapper.NativeEnvironment env)
             {
-                if (SquirrelFunctions.getstackobj(SquirrelInjectorPlugin.SquirrelVM, -1, out _SavedTable) == 0)
+                CompileFileCall c = new CompileFileCall();
+                if (SquirrelFunctions.getstackobj(SquirrelInjectorPlugin.SquirrelVM, -1, out c.Table) == 0)
                 {
-                    //only save filename when get table succeeded
-                    _LastFile = Marshal.PtrToStringAnsi(env.GetParameterP(0));
+                    c.FileName = Marshal.PtrToStringAnsi(env.GetParameterP(0));
+                    _CallStack.Push(c);
                 }
             }
         }
@@ -64,11 +67,8 @@ namespace PluginUtils.Injection.Squirrel
 
             protected override void Triggered(NativeWrapper.NativeEnvironment env)
             {
-                if (_LastFile != null)
-                {
-                    CompileFileInjectionManager.AfterCompileFile(_LastFile, ref _SavedTable);
-                    _LastFile = null;
-                }
+                var c = _CallStack.Pop();
+                CompileFileInjectionManager.AfterCompileFile(c.FileName, ref c.Table);
             }
         }
     }

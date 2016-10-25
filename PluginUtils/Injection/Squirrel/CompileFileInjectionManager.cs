@@ -94,8 +94,6 @@ namespace PluginUtils.Injection.Squirrel
                 return -1;
             }
 
-            //TODO make it faster?
-            //IntPtr obj = Marshal.AllocHGlobal(8);
             SquirrelFunctions.SQObject obj;
             SquirrelFunctions.getstackobj(vm, -1, out obj);
 
