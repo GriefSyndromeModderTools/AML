@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace PluginUtils.Injection.Squirrel
 {
-    //TODO 1 sq text code will not trigger
     class CompileFileInjectorPlugin : IAMLPlugin
     {
         private struct CompileFileCall

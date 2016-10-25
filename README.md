@@ -13,7 +13,7 @@ Yet there are a few things to note before build this project.
 The nuget package Unmanaged Exports requires x86 or x64 platform in order to work.
 As most DLLs will be attached to the game process, which is x86, please build the solution in x86 platform.
 If you are using a Chinese version of Windows (or maybe languages other than English), you'll probably have difficulties in
-building AMLInjected. Refer to http://stackoverflow.com/a/27939875/3622514.
+building AMLInjected. Refer to http://stackoverflow.com/a/27939875/3622514. Fortunately AMLInjected is seldom modified and don't need to build very often.
 
 # Test
 To use the modloader, you need to:
@@ -47,3 +47,14 @@ AMLLoader is the executable file used to start the game process and load AMLInje
 AMLInjected is the first DLL injected into the game process and the only one by AMLLoader. It then loads other DLLs including plugins. The nuget package Unmanaged Exports is used to export a function (of course writted in C#) so that is can be found by Windows API GetProcAddress. The AMLLoader then use this address to start the modloader. (DllMain can not be managed so we have to export a function.)
 
 PluginUtils is the first DLL loaded by AMLInjected. It acts as a common library used by all other plugins. It will also be the only file one needed to develop a plugin for AML. The NativeWrapper class in it allow other plugins to inject C# codes into the game. It also contains some basic functions such as injecting into Squirrel VM and DirectX Device and therefore other plugins don't need to inject them.
+
+# Mods
+Other projects are mods using AML. Both mods and AML are under heavy development. The planned function of these mods are:
+
+* AGSO - Another Griefsyndrome Online. Providing more functions and better network stability. WIP. One of the main purposes of AML.
+* FramerateCtrl - Control the fps of the game. Currently only support acceration. The limit is about 10 to 30 times faster.
+* NetworkRemoteDelegatePlugin - Abandoned.
+* RenderOffset - Control the DX rendering. Make a scaling and translation on every draw. This will allow user to view objects beyond original screen border.
+* Result_poi - Show more results and statistics for every game. Maintained by Kusako.
+* Show_poi - Test project by Kusako.
+* TestMod - Test project by acaly.
