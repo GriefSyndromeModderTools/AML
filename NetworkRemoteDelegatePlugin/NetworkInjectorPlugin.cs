@@ -12,7 +12,7 @@ namespace NetworkRemoteDelegatePlugin
     {
         public void Init()
         {
-            new CloseSocket(this);
+            new CloseSocketClass(this);
         }
 
         public void Load()
@@ -30,12 +30,12 @@ namespace NetworkRemoteDelegatePlugin
             return ProcessReturnValue(ret);
         }
 
-        private class CloseSocket : NativeWrapper
+        private class CloseSocketClass : NativeWrapper
         {
             private readonly NetworkInjectorPlugin _Parent;
             private delegate int FuncType(int i);
 
-            public CloseSocket(NetworkInjectorPlugin parent)
+            public CloseSocketClass(NetworkInjectorPlugin parent)
             {
                 _Parent = parent;
                 this.InjectFunctionPointer<FuncType>(AddressHelper.CodeOffset("gso", 0x1C264), 4);
@@ -52,28 +52,28 @@ namespace NetworkRemoteDelegatePlugin
 }
 /*
 
-	//check for SOCKET_ERROR(-1)
-	//100, int -> int, int
-	ret_i = closesocket(s);
+    //check for SOCKET_ERROR(-1)
+    //100, int -> int, int
+    ret_i = closesocket(s);
 
-	//check error INVALID_SOCKET(-1)
-	//101, int, int, int -> int, int
-	s = socket(int_any, int_any, int_any);
+    //check error INVALID_SOCKET(-1)
+    //101, int, int, int -> int, int
+    s = socket(int_any, int_any, int_any);
 
-	//check for SOCKET_ERROR(-1)
-	//102, int, buffer_in -> int, int
-	ret_i = bind(s, (const sockaddr*)addr_buffer, sizeof(addr_buffer));
+    //check for SOCKET_ERROR(-1)
+    //102, int, buffer_in -> int, int
+    ret_i = bind(s, (const sockaddr*)addr_buffer, sizeof(addr_buffer));
 
-	//check for SOCKET_ERROR(-1)
-	//103, int, buffer_in, int, buffer_in -> int, int
-	ret_i = sendto(s, data_buffer, data_buffer_len, int_any, (const sockaddr*)addr_buffer, sizeof(addr_buffer));
+    //check for SOCKET_ERROR(-1)
+    //103, int, buffer_in, int, buffer_in -> int, int
+    ret_i = sendto(s, data_buffer, data_buffer_len, int_any, (const sockaddr*)addr_buffer, sizeof(addr_buffer));
 
-	//check for SOCKET_ERROR(-1)
-	//104, int, int, int -> int, int
-	ret_i = ioctlsocket(s, int_any, NULL);
+    //check for SOCKET_ERROR(-1)
+    //104, int, int, int -> int, int
+    ret_i = ioctlsocket(s, int_any, NULL);
 
-	//check for SOCKET_ERROR(-1)
-	//105, int, buffer_out, int, buffer_out_set -> int, int
-	ret_i = recvfrom(s, data_buffer, data_buffer_len, int_any, (sockaddr*)addr_buffer, &addr_buffer_len);
+    //check for SOCKET_ERROR(-1)
+    //105, int, buffer_out, int, buffer_out_set -> int, int
+    ret_i = recvfrom(s, data_buffer, data_buffer_len, int_any, (sockaddr*)addr_buffer, &addr_buffer_len);
 
 */

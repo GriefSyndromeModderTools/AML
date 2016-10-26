@@ -21,7 +21,7 @@ namespace AMLInjected
             var dir = Path.GetDirectoryName(Uri.UnescapeDataString(uri));
             var dllFiles = Directory.EnumerateFiles(Path.Combine(dir, "../mods"), "*.dll",
                 SearchOption.TopDirectoryOnly);
-
+            
             AppDomain.CurrentDomain.AppendPrivatePath("aml/core");
             AppDomain.CurrentDomain.AppendPrivatePath("aml/mods");
 
@@ -37,7 +37,9 @@ namespace AMLInjected
                 }
                 try
                 {
-                    PluginLoader.LoadPlugin(plugin.GetConstructor(Type.EmptyTypes).Invoke(new object[0]));
+                    var constructorInfo = plugin.GetConstructor(Type.EmptyTypes);
+                    if (constructorInfo != null)
+                        PluginLoader.LoadPlugin(constructorInfo.Invoke(new object[0]));
                 }
                 catch
                 {
@@ -60,7 +62,9 @@ namespace AMLInjected
                     var plugins = types.Where(t => pluginBase.IsAssignableFrom(t));
                     foreach (var plugin in plugins)
                     {
-                        PluginLoader.LoadPlugin(plugin.GetConstructor(Type.EmptyTypes).Invoke(new object[0]));
+                        var constructorInfo = plugin.GetConstructor(Type.EmptyTypes);
+                        if (constructorInfo != null)
+                            PluginLoader.LoadPlugin(constructorInfo.Invoke(new object[0]));
                     }
 
                     LogHelper.LoadedLibrary(assembly);
