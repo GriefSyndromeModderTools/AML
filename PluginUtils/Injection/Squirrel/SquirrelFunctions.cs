@@ -20,13 +20,22 @@ namespace PluginUtils.Injection.Squirrel
         public delegate IntPtr Delegate_I_P(int arg);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate IntPtr Delegate_PI_P(IntPtr arg1, int arg2);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void Delegate_P_V(IntPtr arg);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int Delegate_P_I(IntPtr arg);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate IntPtr Delegate_P_P(IntPtr arg);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void Delegate_PP_V(IntPtr arg1, IntPtr arg2);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate int Delegate_PP_I(IntPtr arg1, IntPtr arg2);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void Delegate_PI_V(IntPtr arg1, int arg2);
@@ -42,6 +51,9 @@ namespace PluginUtils.Injection.Squirrel
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int Delegate_PIP_I(IntPtr arg1, int arg2, IntPtr arg3);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void Delegate_PIP_V(IntPtr arg1, int arg2, IntPtr arg3);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int Delegate_PIpO_I(IntPtr arg1, int arg2, out SQObject arg3);
@@ -70,6 +82,20 @@ namespace PluginUtils.Injection.Squirrel
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int Delegate_PPISI_I(IntPtr arg1, IntPtr arg2, int arg3,
             [MarshalAs(UnmanagedType.LPStr)]string arg4, int arg5);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate int Delegate_PPP_I(IntPtr arg1, IntPtr arg2, IntPtr arg3);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.LPStr)]
+        public delegate string Delegate_PI_S(IntPtr arg1, int arg2);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.LPStr)]
+        public delegate string Delegate_PII_S(IntPtr arg1, int arg2, int arg3);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate int Delegate_PS_I(IntPtr arg1, [MarshalAs(UnmanagedType.LPStr)]string arg2);
 
         public static Delegate_P_V setdebughook = GetFunction<Delegate_P_V>(0x12B630);
 
@@ -113,6 +139,38 @@ namespace PluginUtils.Injection.Squirrel
 
         public static Delegate_PIII_I call = GetFunction<Delegate_PIII_I>(0x12BEF0);
         public static Delegate_PPISI_I compilebuffer_ = GetFunction<Delegate_PPISI_I>(0x12E270);
+
+        public static Delegate_PIP_I setnativeclosurename = GetFunction<Delegate_PIP_I>(0x12D7D0);
+        public static Delegate_PIP_I setparamscheck = GetFunction<Delegate_PIP_I>(0x12F020);
+        public static Delegate_PI_P newthread = GetFunction<Delegate_PI_P>(0x12B4F0);
+        public static Delegate_P_V seterrorhandler = GetFunction<Delegate_P_V>(0x12B5C0);
+        public static Delegate_PI_V tostring = GetFunction<Delegate_PI_V>(0x12B9E0);
+        public static Delegate_PIP_I getthread = GetFunction<Delegate_PIP_I>(0x12BBE0);
+        public static Delegate_P_V poptop = GetFunction<Delegate_P_V>(0x12BCB0);
+        public static Delegate_P_V resetobject = GetFunction<Delegate_P_V>(0x12BE40);
+        public static Delegate_PS_I throwerror = GetFunction<Delegate_PS_I>(0x12BE60);
+        public static Delegate_P_I suspendvm = GetFunction<Delegate_P_I>(0x12BFB0);
+        public static Delegate_PIII_I wakeupvm = GetFunction<Delegate_PIII_I>(0x12BFC0);
+        public static Delegate_PIP_V setreleasehook = GetFunction<Delegate_PIP_V>(0x12C140);
+        public static Delegate_PP_V setcompilererrorhandler = GetFunction<Delegate_PP_V>(0x12C1B0);
+        public static Delegate_PPP_I writeclosure = GetFunction<Delegate_PPP_I>(0x12C1D0);
+        public static Delegate_PPP_I readclosure = GetFunction<Delegate_PPP_I>(0x12C260);
+        public static Delegate_PI_S getscratchpad = GetFunction<Delegate_PI_S>(0x12C370);
+        public static Delegate_P_I collectgarbage = GetFunction<Delegate_P_I>(0x12C390);
+        public static Delegate_PI_I setattributes = GetFunction<Delegate_PI_I>(0x12C3B0);
+        public static Delegate_PI_I getattributes = GetFunction<Delegate_PI_I>(0x12C530);
+        public static Delegate_PI_I getclass = GetFunction<Delegate_PI_I>(0x12C620);
+        public static Delegate_PI_I createinstance = GetFunction<Delegate_PI_I>(0x12C6A0);
+        public static Delegate_PI_V weakref = GetFunction<Delegate_PI_V>(0x12C720);
+        public static Delegate_PI_I getweakrefval = GetFunction<Delegate_PI_I>(0x12C7B0);
+        public static Delegate_PPI_V move = GetFunction<Delegate_PPI_V>(0x12CA80);
+        public static Delegate_PP_V setprintfunc = GetFunction<Delegate_PP_V>(0x12CAC0);
+        public static Delegate_P_P getprintfunc = GetFunction<Delegate_P_P>(0x12CAE0);
+        public static Delegate_PI_I getsize = GetFunction<Delegate_PI_I>(0x12D9C0);
+        public static Delegate_PI_I setdelegate = GetFunction<Delegate_PI_I>(0x12DEE0);
+        public static Delegate_PI_I get = GetFunction<Delegate_PI_I>(0x12DFC0);
+        public static Delegate_PII_S getlocal = GetFunction<Delegate_PII_S>(0x12E160);
+        public static Delegate_PIP_I stackinfos = GetFunction<Delegate_PIP_I>(0x13ABE0);
 
         private static T GetFunction<T>(uint offset)
         {
