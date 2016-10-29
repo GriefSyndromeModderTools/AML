@@ -19,12 +19,34 @@ namespace PluginUtils.Injection.Squirrel
 
         public void Init()
         {
+            new InjectBeforeArgs().InjectSelf();
             new InjectBeforeRun().InjectSelf();
             new InjectAfterRun().InjectSelf();
         }
 
         public void Load()
         {
+        }
+
+        private class InjectBeforeArgs : NativeWrapper
+        {
+            public InjectBeforeArgs()
+            {
+                this.AddRegisterRead(Register.EAX);
+                this.AddRegisterRead(Register.EBP);
+            }
+
+            public void InjectSelf()
+            {
+                this.Inject(AddressHelper.CodeOffset(0xB71BF), 9); //binary
+                this.Inject(AddressHelper.CodeOffset(0xB72DC), 9); //text
+            }
+
+            protected override void Triggered(NativeWrapper.NativeEnvironment env)
+            {
+                var filename = Marshal.PtrToStringAnsi(env.GetParameterP(0));
+                CompileFileInjectionManager.BeforeCompileFile(filename);
+            }
         }
 
         private class InjectBeforeRun : NativeWrapper

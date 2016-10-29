@@ -41,7 +41,7 @@ namespace AGSO.Core.Input
             var ret = new int[9 * 3];
             for (int i = 0; i < ret.Length; ++i)
             {
-                ret[i] = i + 10;
+                ret[i] = i + 30;
             }
             return ret;
         }

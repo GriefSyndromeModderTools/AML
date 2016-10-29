@@ -26,6 +26,10 @@ namespace TestMod
                 SquirrelFunctions.pop(vm, 2);
                 //use lap
             });
+            SquirrelHelper.InjectCompileFileMain("data/script/boot.nut").AddBefore(vm =>
+            {
+                WindowsHelper.MessageBox("boot!!");
+            });
         }
 
         public void Load()

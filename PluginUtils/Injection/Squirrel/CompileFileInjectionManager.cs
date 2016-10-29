@@ -12,7 +12,20 @@ namespace PluginUtils.Injection.Squirrel
         private static Dictionary<string, Dictionary<string, int>> _FunctionDict =
             new Dictionary<string, Dictionary<string, int>>();
         private static List<InjectedScriptFunction> _FunctionList = new List<InjectedScriptFunction>();
+        private static Dictionary<string, int> _FunctionMainDict = new Dictionary<string, int>();
 
+        //called by plugin, before calling the compiled script
+        public static void BeforeCompileFile(string file)
+        {
+            var vm = SquirrelInjectorPlugin.SquirrelVM;
+            int index;
+            if (_FunctionMainDict.TryGetValue(file, out index))
+            {
+                ReplaceFunction(vm, index);
+            }
+        }
+
+        //called by plugin, after calling the compiled script
         public static void AfterCompileFile(string file, ref SquirrelFunctions.SQObject table)
         {
             var vm = SquirrelInjectorPlugin.SquirrelVM;
@@ -47,15 +60,19 @@ namespace PluginUtils.Injection.Squirrel
         {
             //table func
 
-            SquirrelFunctions.pushinteger(vm, index); //table func index
-            SquirrelFunctions.newclosure(vm, Marshal.GetFunctionPointerForDelegate(_InjectedEntrance), 2);
-            //table func_new
+            ReplaceFunction(vm, index);//table func_new
 
             //save the function into table
             SquirrelFunctions.pushstring(vm, key, -1);//table func_new key
             SquirrelFunctions.push(vm, -2);//table func_new key func_new
             SquirrelFunctions.newslot(vm, -4, 0);//table func_new
             SquirrelFunctions.pop(vm, 1);//table
+        }
+
+        private static void ReplaceFunction(IntPtr vm, int index)
+        {
+            SquirrelFunctions.pushinteger(vm, index);
+            SquirrelFunctions.newclosure(vm, Marshal.GetFunctionPointerForDelegate(_InjectedEntrance), 2);
         }
 
         //save the entrance
@@ -74,6 +91,20 @@ namespace PluginUtils.Injection.Squirrel
             {
                 index = _FunctionList.Count;
                 s.Add(func, index);
+                var ret = new InjectedScriptFunction();
+                _FunctionList.Add(ret);
+                return ret;
+            }
+            return _FunctionList[index];
+        }
+
+        public static InjectedScriptFunction InjectCompileFileMain(string script)
+        {
+            int index;
+            if (!_FunctionMainDict.TryGetValue(script, out index))
+            {
+                index = _FunctionList.Count;
+                _FunctionMainDict.Add(script, index);
                 var ret = new InjectedScriptFunction();
                 _FunctionList.Add(ret);
                 return ret;

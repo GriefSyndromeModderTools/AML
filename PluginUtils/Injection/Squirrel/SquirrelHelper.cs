@@ -49,6 +49,11 @@ namespace PluginUtils.Injection.Squirrel
             return CompileFileInjectionManager.InjectCompileFile(script, func);
         }
 
+        public static InjectedScriptFunction InjectCompileFileMain(string script)
+        {
+            return CompileFileInjectionManager.InjectCompileFileMain(script);
+        }
+
         public static IntPtr CompileScriptFunction(string code, string name)
         {
             var ret = Marshal.AllocHGlobal(8);
