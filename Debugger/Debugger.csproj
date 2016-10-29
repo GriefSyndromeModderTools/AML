@@ -30,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\Downloads\Compress\Json90r1\Bin\Net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -42,6 +45,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BreakPointSetter.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BreakPointSetter.Designer.cs">
+      <DependentUpon>BreakPointSetter.cs</DependentUpon>
+    </Compile>
     <Compile Include="DebuggerPlugin.cs" />
     <Compile Include="DebuggerWindow.cs">
       <SubType>Form</SubType>
@@ -58,6 +67,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="BreakPointSetter.resx">
+      <DependentUpon>BreakPointSetter.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DebuggerWindow.resx">
       <DependentUpon>DebuggerWindow.cs</DependentUpon>
     </EmbeddedResource>

@@ -8,6 +8,6 @@ namespace PluginUtils
 {
     public interface IAMLPluginManager
     {
-        T GetPlguin<T>() where T : IAMLPlugin;
+        T GetPlugin<T>() where T : IAMLPlugin;
     }
 }

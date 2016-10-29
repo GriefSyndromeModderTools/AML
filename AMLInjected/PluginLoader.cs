@@ -34,7 +34,7 @@ namespace AMLInjected
                 _Plugins = PluginLoader._Plugins.ToDictionary(p => p.GetType());
             }
 
-            public T GetPlguin<T>() where T : IAMLPlugin
+            public T GetPlugin<T>() where T : IAMLPlugin
             {
                 IAMLPlugin p;
                 if (_Plugins.TryGetValue(typeof(T), out p))
