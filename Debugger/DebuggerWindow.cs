@@ -14,8 +14,8 @@ namespace Debugger
 {
     public partial class DebuggerWindow : Form
     {
-        private readonly DebuggerPlugin _plugin;
         private readonly BreakPointSetter _breakPointSetter;
+        private readonly Interactive _interactive;
         public readonly Dictionary<string, HashSet<int>> BreakPointMap = new Dictionary<string, HashSet<int>>();
 
         public enum State
@@ -28,6 +28,7 @@ namespace Debugger
         }
 
         private volatile State _debuggerState = State.Running;
+
         public State DebuggerState
         {
             get
@@ -41,7 +42,11 @@ namespace Debugger
             }
         }
 
-        private class MessageHandler : IMessageHandler
+        public DebuggerPlugin Plugin { get; }
+
+        public MessageHandler DebuggerMessageHandler { get; }
+
+        public class MessageHandler : IMessageHandler
         {
             private readonly DebuggerWindow _window;
 
@@ -55,6 +60,11 @@ namespace Debugger
             public MessageHandler(DebuggerWindow window)
             {
                 _window = window;
+            }
+
+            public void RegisterSource(string source, string code)
+            {
+                _sourceMap[source] = code;
             }
 
             private string GetSource(Uri uri, string src)
@@ -161,20 +171,15 @@ namespace Debugger
                 {
                     ShowLine(srcname, line);
                     _window.SetControlEnabled();
-                    _window._plugin.Suspend();
+                    _window.Plugin.Suspend();
                 }
-
-                /*_window.Invoke((Action) (() =>
-                {
-                    _window.listBox1.Items.Add($"type {(char)type}, source {srcname}, line {line}, function {funcname}");
-                }));*/
             }
 
             private void ShowLine(string srcname, int line)
             {
                 var originLine = line;
                 --line;
-                var uris = _window._plugin.CurrentConfig?.SourceUri;
+                var uris = _window.Plugin.CurrentConfig?.SourceUri;
                 if (uris == null)
                 {
                     return;
@@ -200,14 +205,14 @@ namespace Debugger
 
                             if (linestr != null)
                             {
-                                _window.Invoke((Action)(() => { _window.listBox1.Items.Add($"(Source: {uri + srcname} : {originLine}){linestr}"); }));
+                                _window.Invoke((Action)(() => { _window.AddMessage($"(Source: {uri + srcname} : {originLine}){linestr}"); }));
                             }
                         }
 
                         return;
                     }
                 }
-                _window.Invoke((Action)(() => { _window.listBox1.Items.Add($"Could not load source \"{srcname}\" from provided uris"); }));
+                _window.Invoke((Action)(() => { _window.AddMessage($"Could not load source \"{srcname}\" from provided uris"); }));
             }
 
             public void CompilerExceptionArrived(string exceptiondesc, string srcname, int line, int column)
@@ -215,7 +220,7 @@ namespace Debugger
                 _window.Invoke((Action)(() =>
                 {
                     ShowLine(srcname, line);
-                    _window.listBox1.Items.Add($"Unhandled compiler exception detected, description: {exceptiondesc}, source: {srcname}, line: {line}, column: {column}");
+                    _window.AddMessage($"Unhandled compiler exception detected, description: {exceptiondesc}, source: {srcname}, line: {line}, column: {column}");
                 }));
             }
 
@@ -223,20 +228,22 @@ namespace Debugger
             {
                 _window.Invoke((Action) (() =>
                 {
-                    _window.listBox1.Items.Add($"Unhandled exception detected, description: {exceptiondesc}");
+                    _window.AddMessage($"Unhandled exception detected, description: {exceptiondesc}");
                 }));
                 
                 _window.DebuggerState = State.Breaking;
                 ShowLine(_currentSrcName, _currentLine);
-                _window._plugin.Suspend();
+                _window.Plugin.Suspend();
             }
         }
 
         public DebuggerWindow(DebuggerPlugin plugin)
         {
-            _plugin = plugin;
-            _plugin.RegisterMessageHandler(new MessageHandler(this));
+            Plugin = plugin;
+            DebuggerMessageHandler = new MessageHandler(this);
+            Plugin.RegisterMessageHandler(DebuggerMessageHandler);
             _breakPointSetter = new BreakPointSetter(this);
+            _interactive = new Interactive(this);
             InitializeComponent();
         }
 
@@ -264,6 +271,11 @@ namespace Debugger
             btnContinue.Enabled = btnExeToRet.Enabled = btnStepInto.Enabled = btnStepOver.Enabled = !value;
         }
 
+        public void AddMessage(string msg)
+        {
+            listBox1.Items.Add(msg);
+        }
+
         private void btnPause_Click(object sender, EventArgs e)
         {
             DebuggerState = State.Breaking;
@@ -272,7 +284,7 @@ namespace Debugger
         private void btnContinue_Click(object sender, EventArgs e)
         {
             DebuggerState = State.Running;
-            _plugin.Resume();
+            Plugin.Resume();
             SetControlEnabled();
         }
 
@@ -284,22 +296,27 @@ namespace Debugger
         private void btnStepInto_Click(object sender, EventArgs e)
         {
             DebuggerState = State.Breaking;
-            _plugin.Resume();
+            Plugin.Resume();
             SetControlEnabled();
         }
 
         private void btnStepOver_Click(object sender, EventArgs e)
         {
             DebuggerState = State.StepOver;
-            _plugin.Resume();
+            Plugin.Resume();
             SetControlEnabled();
         }
 
         private void btnExeToRet_Click(object sender, EventArgs e)
         {
             DebuggerState = State.BreakReturning;
-            _plugin.Resume();
+            Plugin.Resume();
             SetControlEnabled();
+        }
+        
+        private void btnInteractive_Click(object sender, EventArgs e)
+        {
+            _interactive.Show();
         }
 
         private void DebuggerWindow_FormClosing(object sender, FormClosingEventArgs e)

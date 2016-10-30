@@ -242,5 +242,24 @@ namespace Debugger
                 Monitor.Pulse(_lock);
             }
         }
+
+        public SquirrelFunctions.SQObject Execute(string code, string name)
+        {
+            var vm = SquirrelHelper.SquirrelVM;
+            if (vm == IntPtr.Zero)
+            {
+                throw new SquirrelVMNotPreparedException();
+            }
+
+            SquirrelFunctions.SQObject ret;
+            var func = SquirrelHelper.CompileScriptFunction(code, name);
+            SquirrelFunctions.pushobject(vm, func);
+            SquirrelFunctions.pushroottable(vm);
+            SquirrelFunctions.call(vm, 1, 1, 1);
+            SquirrelFunctions.getstackobj(vm, -1, out ret);
+            SquirrelFunctions.addref_(vm, ref ret);
+            SquirrelFunctions.pop(vm, 2);
+            return ret;
+        }
     }
 }

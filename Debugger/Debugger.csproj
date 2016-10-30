@@ -58,6 +58,12 @@
     <Compile Include="DebuggerWindow.Designer.cs">
       <DependentUpon>DebuggerWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="Interactive.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Interactive.Designer.cs">
+      <DependentUpon>Interactive.cs</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -72,6 +78,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="DebuggerWindow.resx">
       <DependentUpon>DebuggerWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Interactive.resx">
+      <DependentUpon>Interactive.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

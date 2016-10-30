@@ -36,12 +36,13 @@
             this.btnStepOver = new System.Windows.Forms.Button();
             this.btnPause = new System.Windows.Forms.Button();
             this.btnExeToRet = new System.Windows.Forms.Button();
+            this.btnInteractive = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnContinue
             // 
             this.btnContinue.Enabled = false;
-            this.btnContinue.Location = new System.Drawing.Point(106, 336);
+            this.btnContinue.Location = new System.Drawing.Point(105, 336);
             this.btnContinue.Name = "btnContinue";
             this.btnContinue.Size = new System.Drawing.Size(83, 41);
             this.btnContinue.TabIndex = 1;
@@ -55,7 +56,7 @@
             this.listBox1.ItemHeight = 12;
             this.listBox1.Location = new System.Drawing.Point(12, 12);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(616, 232);
+            this.listBox1.Size = new System.Drawing.Size(642, 232);
             this.listBox1.TabIndex = 6;
             this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
             // 
@@ -66,12 +67,12 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(615, 80);
+            this.textBox1.Size = new System.Drawing.Size(641, 80);
             this.textBox1.TabIndex = 7;
             // 
             // btnSetBreakPoint
             // 
-            this.btnSetBreakPoint.Location = new System.Drawing.Point(200, 336);
+            this.btnSetBreakPoint.Location = new System.Drawing.Point(198, 336);
             this.btnSetBreakPoint.Name = "btnSetBreakPoint";
             this.btnSetBreakPoint.Size = new System.Drawing.Size(83, 41);
             this.btnSetBreakPoint.TabIndex = 2;
@@ -82,7 +83,7 @@
             // btnStepInto
             // 
             this.btnStepInto.Enabled = false;
-            this.btnStepInto.Location = new System.Drawing.Point(294, 336);
+            this.btnStepInto.Location = new System.Drawing.Point(291, 336);
             this.btnStepInto.Name = "btnStepInto";
             this.btnStepInto.Size = new System.Drawing.Size(83, 41);
             this.btnStepInto.TabIndex = 3;
@@ -93,7 +94,7 @@
             // btnStepOver
             // 
             this.btnStepOver.Enabled = false;
-            this.btnStepOver.Location = new System.Drawing.Point(388, 336);
+            this.btnStepOver.Location = new System.Drawing.Point(384, 336);
             this.btnStepOver.Name = "btnStepOver";
             this.btnStepOver.Size = new System.Drawing.Size(83, 41);
             this.btnStepOver.TabIndex = 4;
@@ -114,7 +115,7 @@
             // btnExeToRet
             // 
             this.btnExeToRet.Enabled = false;
-            this.btnExeToRet.Location = new System.Drawing.Point(482, 336);
+            this.btnExeToRet.Location = new System.Drawing.Point(477, 336);
             this.btnExeToRet.Name = "btnExeToRet";
             this.btnExeToRet.Size = new System.Drawing.Size(83, 41);
             this.btnExeToRet.TabIndex = 5;
@@ -122,11 +123,22 @@
             this.btnExeToRet.UseVisualStyleBackColor = true;
             this.btnExeToRet.Click += new System.EventHandler(this.btnExeToRet_Click);
             // 
+            // btnInteractive
+            // 
+            this.btnInteractive.Location = new System.Drawing.Point(570, 336);
+            this.btnInteractive.Name = "btnInteractive";
+            this.btnInteractive.Size = new System.Drawing.Size(83, 41);
+            this.btnInteractive.TabIndex = 8;
+            this.btnInteractive.Text = "交互";
+            this.btnInteractive.UseVisualStyleBackColor = true;
+            this.btnInteractive.Click += new System.EventHandler(this.btnInteractive_Click);
+            // 
             // DebuggerWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(640, 392);
+            this.ClientSize = new System.Drawing.Size(666, 392);
+            this.Controls.Add(this.btnInteractive);
             this.Controls.Add(this.btnExeToRet);
             this.Controls.Add(this.btnPause);
             this.Controls.Add(this.btnStepOver);
@@ -155,5 +167,6 @@
         private System.Windows.Forms.Button btnStepOver;
         private System.Windows.Forms.Button btnPause;
         private System.Windows.Forms.Button btnExeToRet;
+        private System.Windows.Forms.Button btnInteractive;
     }
 }

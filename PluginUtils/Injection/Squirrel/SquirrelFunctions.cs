@@ -10,10 +10,18 @@ namespace PluginUtils.Injection.Squirrel
 {
     public class SquirrelFunctions
     {
+        [StructLayout(LayoutKind.Explicit)]
+        public struct SQObjectValue
+        {
+            [FieldOffset(0)] public IntPtr Pointer;
+            [FieldOffset(0)] public int Integer;
+            [FieldOffset(0)] public float Float;
+        }
+
         public struct SQObject
         {
-            public int Type;
-            public int Pointer; //TODO make it pointer
+            public SquirrelHelper.SQObjectType Type;
+            public SQObjectValue Value;
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -59,7 +67,16 @@ namespace PluginUtils.Injection.Squirrel
         public delegate int Delegate_PIpO_I(IntPtr arg1, int arg2, out SQObject arg3);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void Delegate_PpO_V(IntPtr arg1, ref SQObject arg2);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate int Delegate_PpO_I(IntPtr arg1, ref SQObject arg2);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void Delegate_PII_V(IntPtr arg1, int arg2, int arg3);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void Delegate_PushObject(IntPtr arg1, SquirrelHelper.SQObjectType arg2, SQObjectValue arg3);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void Delegate_PPI_V(IntPtr arg1, IntPtr arg2, int arg3);
@@ -130,8 +147,11 @@ namespace PluginUtils.Injection.Squirrel
 
         public static Delegate_PIP_I getstackobj_ = GetFunction<Delegate_PIP_I>(0x12BDA0);
         public static Delegate_PIpO_I getstackobj = GetFunction<Delegate_PIpO_I>(0x12BDA0);
-        public static Delegate_PII_V pushobject_ = GetFunction<Delegate_PII_V>(0x12BDF0);
+        public static Delegate_PushObject pushobject_ = GetFunction<Delegate_PushObject>(0x12BDF0);
         public static Delegate_PP_V addref = GetFunction<Delegate_PP_V>(0x12B6C0);
+        public static Delegate_PpO_V addref_ = GetFunction<Delegate_PpO_V>(0x12B6C0);
+        public static Delegate_PP_I release = GetFunction<Delegate_PP_I>(0x12B6F0);
+        public static Delegate_PpO_I release_ = GetFunction<Delegate_PpO_I>(0x12B6F0);
 
         public static Delegate_PPI_V newclosure = GetFunction<Delegate_PPI_V>(0x12EA10);
         public static Delegate_P_V newtable = GetFunction<Delegate_P_V>(0x12B8C0);
@@ -189,9 +209,8 @@ namespace PluginUtils.Injection.Squirrel
         //this function use the pointer of the object and send it to original function
         public static void pushobject(IntPtr vm, IntPtr pObj)
         {
-            int i1 = Marshal.ReadInt32(pObj);
-            int i2 = Marshal.ReadInt32(pObj, 4);
-            pushobject_(vm, i1, i2);
+            var obj = (SQObject) Marshal.PtrToStructure(pObj, typeof(SQObject));
+            pushobject_(vm, obj.Type, obj.Value);
         }
 
         [DllImport("kernel32.dll", CharSet = CharSet.Ansi, ExactSpelling = true)]
