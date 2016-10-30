@@ -27,7 +27,19 @@ namespace Debugger
             StepOver,
         }
 
-        public State DebuggerState { get; private set; } = State.Running;
+        private volatile State _debuggerState = State.Running;
+        public State DebuggerState
+        {
+            get
+            {
+                return _debuggerState;
+            }
+
+            private set
+            {
+                _debuggerState = value;
+            }
+        }
 
         private class MessageHandler : IMessageHandler
         {
@@ -67,6 +79,12 @@ namespace Debugger
                                 .GetResponse()
                                 .GetResponseStream();
                         }
+                        else if (src.EndsWith("cv4"))
+                        {
+                            stream = WebRequest.Create(uri + src.Substring(0, src.Length - 3) + "nut")
+                                .GetResponse()
+                                .GetResponseStream();
+                        }
                         else
                         {
                             throw;
@@ -96,41 +114,27 @@ namespace Debugger
                 _currentLine = line;
                 _currentFuncName = funcname;
 
+                // Change state
                 var ctype = (char) type;
-
                 switch (ctype)
                 {
                     case 'l':
-                        if (_window.DebuggerState == State.Breaking || _window.DebuggerState == State.StepOver)
+                        if (_window.DebuggerState == State.StepOver)
                         {
-                            _window._plugin.SuspendVm();
-                            _window.Invoke((Action) (() =>
-                            {
-                                _window.SetControlEnabled(false);
-                            }));
-                            
-                            ShowLine(srcname, line);
+                            _window.DebuggerState = State.Breaking;
+                        }
+
+                        if (_window.DebuggerState == State.Breaking)
+                        {
                             break;
                         }
                         
                         HashSet<int> breakPoints;
                         if (_window.BreakPointMap.TryGetValue(_currentSrcName, out breakPoints) && breakPoints != null && breakPoints.Contains(_currentLine))
                         {
-                            _window._plugin.SuspendVm();
-                            _window.DebuggerState = State.Breaking;
-                            _window.Invoke((Action)(() =>
-                            {
-                                _window.SetControlEnabled(false);
-                            }));
-
                             ShowLine(srcname, line);
-                            break;
+                            _window.DebuggerState = State.Breaking;
                         }
-
-                        _window.Invoke((Action)(() =>
-                        {
-                            _window.SetControlEnabled(true);
-                        }));
 
                         break;
                     case 'c':
@@ -140,24 +144,26 @@ namespace Debugger
                         }
                         break;
                     case 'r':
-                        if (_window.DebuggerState == State.BreakReturning)
+                        switch (_window.DebuggerState)
                         {
-                            _window._plugin.SuspendVm();
-                            _window.DebuggerState = State.Breaking;
-                            _window.Invoke((Action)(() =>
-                            {
-                                _window.SetControlEnabled(false);
-                            }));
-
-                            ShowLine(srcname, line);
-                        }
-                        else if (_window.DebuggerState == State.BreakAfterReturn)
-                        {
-                            _window.DebuggerState = State.Breaking;
+                            case State.BreakReturning:
+                                _window.DebuggerState = State.Breaking;
+                                break;
+                            case State.BreakAfterReturn:
+                                _window.DebuggerState = State.Breaking;
+                                break;
                         }
                         break;
                 }
-                
+
+                // Apply state
+                if (_window.DebuggerState == State.Breaking)
+                {
+                    ShowLine(srcname, line);
+                    _window.SetControlEnabled();
+                    _window._plugin.Suspend();
+                }
+
                 /*_window.Invoke((Action) (() =>
                 {
                     _window.listBox1.Items.Add($"type {(char)type}, source {srcname}, line {line}, function {funcname}");
@@ -219,10 +225,10 @@ namespace Debugger
                 {
                     _window.listBox1.Items.Add($"Unhandled exception detected, description: {exceptiondesc}");
                 }));
-
-                _window._plugin.SuspendVm();
+                
                 _window.DebuggerState = State.Breaking;
                 ShowLine(_currentSrcName, _currentLine);
+                _window._plugin.Suspend();
             }
         }
 
@@ -247,6 +253,11 @@ namespace Debugger
             }
         }
 
+        private void SetControlEnabled()
+        {
+            SetControlEnabled(DebuggerState != State.Breaking);
+        }
+
         private void SetControlEnabled(bool value)
         {
             btnPause.Enabled = value;
@@ -255,16 +266,14 @@ namespace Debugger
 
         private void btnPause_Click(object sender, EventArgs e)
         {
-            _plugin.SuspendVm();
             DebuggerState = State.Breaking;
-            SetControlEnabled(false);
         }
         
         private void btnContinue_Click(object sender, EventArgs e)
         {
             DebuggerState = State.Running;
-            _plugin.WakeupVm(true, true, true);
-            SetControlEnabled(true);
+            _plugin.Resume();
+            SetControlEnabled();
         }
 
         private void btnSetBreakPoint_Click(object sender, EventArgs e)
@@ -275,22 +284,31 @@ namespace Debugger
         private void btnStepInto_Click(object sender, EventArgs e)
         {
             DebuggerState = State.Breaking;
-            _plugin.WakeupVm(true, true, true);
-            SetControlEnabled(false);
+            _plugin.Resume();
+            SetControlEnabled();
         }
 
         private void btnStepOver_Click(object sender, EventArgs e)
         {
             DebuggerState = State.StepOver;
-            _plugin.WakeupVm(true, true, true);
-            SetControlEnabled(false);
+            _plugin.Resume();
+            SetControlEnabled();
         }
 
         private void btnExeToRet_Click(object sender, EventArgs e)
         {
             DebuggerState = State.BreakReturning;
-            _plugin.WakeupVm(true, true, true);
-            SetControlEnabled(false);
+            _plugin.Resume();
+            SetControlEnabled();
+        }
+
+        private void DebuggerWindow_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                e.Cancel = true;
+                Hide();
+            }
         }
     }
 }

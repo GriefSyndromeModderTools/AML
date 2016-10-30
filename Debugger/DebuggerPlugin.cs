@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using PluginUtils;
@@ -23,7 +24,9 @@ namespace Debugger
     public class DebuggerPlugin : IAMLPlugin
     {
         private readonly List<IMessageHandler> _messageHandlers = new List<IMessageHandler>();
+        private readonly object _lock = new object();
         private DebuggerWindow _window;
+        private volatile bool _isSuspending;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void CompilerErrorHandler(
@@ -33,6 +36,8 @@ namespace Debugger
         public class Config
         {
             public Uri[] SourceUri { get; set; } = null;
+            // TODO: Unused
+            public Uri CacheUri { get; set; } = null;
         }
 
         public Config CurrentConfig { get; private set; }
@@ -65,6 +70,7 @@ namespace Debugger
             WebRequest.RegisterPrefix("gspack", new GSPackRequestCreate());
 
             ReadConfig();
+            // TODO: Edit config
             SaveConfig();
 
             SquirrelHelper.RegisterGlobalFunction("DebugHook", vm =>
@@ -159,7 +165,7 @@ namespace Debugger
                     {
                         var configStr = reader.ReadToEnd();
                         var config = JsonConvert.DeserializeObject<Config>(configStr);
-                        for (int i = 0; i < config.SourceUri.Length; ++i)
+                        for (var i = 0; i < config.SourceUri.Length; ++i)
                         {
                             var uristr = config.SourceUri[i].OriginalString;
                             if (!uristr.EndsWith("/"))
@@ -203,20 +209,38 @@ namespace Debugger
             }
         }
 
-        public void SuspendVm()
+        /// <summary>
+        /// 阻塞当前线程
+        /// </summary>
+        public void Suspend()
         {
-            SquirrelHelper.Run(vm =>
+            if (_isSuspending)
             {
-                SquirrelFunctions.suspendvm(vm);
-            });
+                return;
+            }
+
+            lock (_lock)
+            {
+                _isSuspending = true;
+                Monitor.Wait(_lock);
+                _isSuspending = false;
+            }
         }
 
-        public void WakeupVm(bool resumedret, bool retval, bool raiseerror)
+        /// <summary>
+        /// 解除对上次阻塞的线程的阻塞
+        /// </summary>
+        public void Resume()
         {
-            SquirrelHelper.Run(vm =>
+            if (!_isSuspending)
             {
-                SquirrelFunctions.wakeupvm(vm, resumedret ? 1 : 0, retval ? 1 : 0, raiseerror ? 1 : 0);
-            });
+                return;
+            }
+            
+            lock (_lock)
+            {
+                Monitor.Pulse(_lock);
+            }
         }
     }
 }

@@ -139,6 +139,7 @@
             this.MaximizeBox = false;
             this.Name = "DebuggerWindow";
             this.Text = "DebuggerWindow";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.DebuggerWindow_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 
