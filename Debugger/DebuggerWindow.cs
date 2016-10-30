@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -170,6 +171,8 @@ namespace Debugger
                 if (_window.DebuggerState == State.Breaking)
                 {
                     ShowLine(srcname, line);
+                    if (Thread.CurrentThread == _window.Invoke((Func<Thread>)(() => Thread.CurrentThread)))
+                        return;
                     _window.SetControlEnabled();
                     _window.Plugin.Suspend();
                 }
@@ -177,8 +180,13 @@ namespace Debugger
 
             private void ShowLine(string srcname, int line)
             {
-                var originLine = line;
-                --line;
+                string src;
+                if (_sourceMap.TryGetValue(srcname, out src))
+                {
+                    _window.Invoke((Action)(() => { _window.AddMessage($"(Source: {srcname} : {line}){src.GetLine(line)}"); }));
+                    return;
+                }
+
                 var uris = _window.Plugin.CurrentConfig?.SourceUri;
                 if (uris == null)
                 {
@@ -192,26 +200,19 @@ namespace Debugger
                         continue;
                     }
 
-                    var source = GetSource(uri, srcname);
-                    if (source != null)
+                    src = GetSource(uri, srcname);
+                    if (src != null)
                     {
-                        using (var reader = new StringReader(source))
+                        var linestr = src.GetLine(line);
+                        if (linestr != null)
                         {
-                            string linestr = null;
-                            while (line-- >= 0)
-                            {
-                                linestr = reader.ReadLine();
-                            }
-
-                            if (linestr != null)
-                            {
-                                _window.Invoke((Action)(() => { _window.AddMessage($"(Source: {uri + srcname} : {originLine}){linestr}"); }));
-                            }
+                            _window.Invoke((Action)(() => { _window.AddMessage($"(Source: {uri + srcname} : {line}){linestr}"); }));
                         }
 
                         return;
                     }
                 }
+
                 _window.Invoke((Action)(() => { _window.AddMessage($"Could not load source \"{srcname}\" from provided uris"); }));
             }
 
@@ -231,8 +232,10 @@ namespace Debugger
                     _window.AddMessage($"Unhandled exception detected, description: {exceptiondesc}");
                 }));
                 
-                _window.DebuggerState = State.Breaking;
                 ShowLine(_currentSrcName, _currentLine);
+                if (Thread.CurrentThread == _window.Invoke((Func<Thread>) (() => Thread.CurrentThread)))
+                    return;
+                _window.DebuggerState = State.Breaking;
                 _window.Plugin.Suspend();
             }
         }

@@ -35,6 +35,9 @@ namespace Debugger
         {
             var code = txtCode.Text;
             _window.DebuggerMessageHandler.RegisterSource("Interactive", code);
+            /*var task = Task.Run(() => _window.Plugin.Execute(code, "Interactive"));
+            task.Wait();
+            var ret = task.Result;*/
             var ret = _window.Plugin.Execute(code, "Interactive");
 
             var msg = new StringBuilder(">> ");
