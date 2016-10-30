@@ -54,8 +54,10 @@
     <Compile Include="Core\Input\InputInjectorPlugin.cs" />
     <Compile Include="Misc\GameWindowTitleFix.cs" />
     <Compile Include="Misc\GSO2ReplayFile.cs" />
+    <Compile Include="Network\Buffer.cs" />
     <Compile Include="Network\Connection.cs" />
     <Compile Include="Network\GameSide.cs" />
+    <Compile Include="Network\NetworkException.cs" />
     <Compile Include="Network\WinSock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

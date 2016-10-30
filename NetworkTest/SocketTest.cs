@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace NetworkTest
 {
-    class Program
+    class SocketTest
     {
         static void Main(string[] args)
         {

@@ -26,14 +26,20 @@ namespace AGSO.Network
 
         [DllImport("ws2_32.dll", SetLastError = true)]
         public static extern int sendto(IntPtr Socket, IntPtr buff, int len, int flags, ref sockaddr_in To, int tomlen);
+
+        [DllImport("ws2_32.dll", SetLastError = true)]
+        public static extern int sendto(IntPtr Socket, byte[] buff, int len, int flags, ref sockaddr_in To, int tomlen);
         
         [DllImport("ws2_32.dll", SetLastError = true)]
         public static extern int recvfrom(IntPtr Socket, IntPtr buf, int len, int flags, ref sockaddr_in from, ref int fromlen);
         
+        [DllImport("ws2_32.dll", SetLastError = true)]
+        public static extern int recvfrom(IntPtr Socket, byte[] buf, int len, int flags, ref sockaddr_in from, ref int fromlen);
+        
         [DllImport("ws2_32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern int closesocket(IntPtr s);
 
-        [DllImport("Ws2_32.dll")]
+        [DllImport("Ws2_32.dll", SetLastError = true)]
         public static extern int ioctlsocket(IntPtr s, uint cmd, ref int argp);
 
         public const ushort AF_INET = 2;
