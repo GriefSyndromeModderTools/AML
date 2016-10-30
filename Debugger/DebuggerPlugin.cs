@@ -66,7 +66,6 @@ namespace Debugger
 
         public void Init()
         {
-            MessageBox.Show("help!");
             WebRequest.RegisterPrefix("gspack", new GSPackRequestCreate());
 
             ReadConfig();

@@ -53,7 +53,7 @@ namespace Debugger
                     msg.Append(ret.Value.Integer == 0 ? "false" : "true");
                     break;
                 case SquirrelHelper.SQObjectType.OT_STRING:
-                    msg.Append($"\"{Marshal.PtrToStringAnsi(ret.Value.Pointer + 16)}\"");
+                    msg.Append($"\"{Marshal.PtrToStringAnsi(ret.Value.Pointer + 28)}\"");
                     break;
                 case SquirrelHelper.SQObjectType.OT_TABLE:
                     msg.Append("(table)");
