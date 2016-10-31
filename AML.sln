@@ -21,6 +21,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestMod", "TestMod\TestMod.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Results_poi", "Results_poi\Results_poi.csproj", "{51A760A9-4891-4881-AE02-47324D52B5BD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkTest", "NetworkTest\NetworkTest.csproj", "{0C2BBD84-3F28-487E-9354-4DA5A95FF0E5}"
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Debugger", "Debugger\Debugger.csproj", "{4D1132DB-D8CC-41EB-AEB4-43B023F39E53}"
 EndProject
 Global

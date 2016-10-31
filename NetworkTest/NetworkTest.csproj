@@ -4,15 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4449F2C7-FA11-4928-9542-86A2606D9CAB}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{0C2BBD84-3F28-487E-9354-4DA5A95FF0E5}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AGSO</RootNamespace>
-    <AssemblyName>AGSO</AssemblyName>
+    <RootNamespace>NetworkTest</RootNamespace>
+    <AssemblyName>NetworkTest</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,6 +23,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -29,11 +31,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>NetworkTest.ConnectionTest</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -41,40 +44,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\Common\InputHandler.cs" />
-    <Compile Include="Core\FP\FPCode.cs" />
-    <Compile Include="Core\GSO\GSOHelper.cs" />
-    <Compile Include="Core\GSO\NetworkListener.cs" />
-    <Compile Include="Core\GSO\NetworkListenerForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Core\GSO\NetworkListenerForm.Designer.cs">
-      <DependentUpon>NetworkListenerForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Core\Input\InputInjectorPlugin.cs" />
-    <Compile Include="Misc\GameWindowTitleFix.cs" />
-    <Compile Include="Misc\GSO2ReplayFile.cs" />
-    <Compile Include="Network\Buffer.cs" />
-    <Compile Include="Network\Connection.cs" />
-    <Compile Include="Network\GameSide.cs" />
-    <Compile Include="Network\NetworkException.cs" />
-    <Compile Include="Network\WinSock.cs" />
+    <Compile Include="ConnectionTest.cs" />
+    <Compile Include="SocketTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PluginUtils\PluginUtils.csproj">
-      <Project>{1841abf6-dd26-4117-942f-1b8d8b902c01}</Project>
-      <Name>PluginUtils</Name>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AGSO\AGSO.csproj">
+      <Project>{4449f2c7-fa11-4928-9542-86a2606d9cab}</Project>
+      <Name>AGSO</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Core\Connection\" />
-    <Folder Include="Core\Render\" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Core\GSO\NetworkListenerForm.resx">
-      <DependentUpon>NetworkListenerForm.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
