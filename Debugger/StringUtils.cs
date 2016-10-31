@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using PluginUtils.Injection.Squirrel;
 
 namespace Debugger
 {
@@ -26,6 +28,49 @@ namespace Debugger
                 }
             }
             return linestr;
+        }
+
+        public static string GetTypeString(this SquirrelHelper.SQObjectType type)
+        {
+            switch (type)
+            {
+                case SquirrelHelper.SQObjectType.OT_NULL:
+                    return "null";
+                case SquirrelHelper.SQObjectType.OT_INTEGER:
+                    return "integer";
+                case SquirrelHelper.SQObjectType.OT_FLOAT:
+                    return "float";
+                case SquirrelHelper.SQObjectType.OT_BOOL:
+                    return "bool";
+                case SquirrelHelper.SQObjectType.OT_STRING:
+                    return "string";
+                case SquirrelHelper.SQObjectType.OT_TABLE:
+                    return "table";
+                case SquirrelHelper.SQObjectType.OT_ARRAY:
+                    return "array";
+                case SquirrelHelper.SQObjectType.OT_USERDATA:
+                    return "userdata";
+                case SquirrelHelper.SQObjectType.OT_CLOSURE:
+                    return "closure";
+                case SquirrelHelper.SQObjectType.OT_NATIVECLOSURE:
+                    return "native closure";
+                case SquirrelHelper.SQObjectType.OT_GENERATOR:
+                    return "generator";
+                case SquirrelHelper.SQObjectType.OT_USERPOINTER:
+                    return "userpointer";
+                case SquirrelHelper.SQObjectType.OT_THREAD:
+                    return "thread";
+                case SquirrelHelper.SQObjectType.OT_FUNCPROTO:
+                    return "funcproto";
+                case SquirrelHelper.SQObjectType.OT_CLASS:
+                    return "class";
+                case SquirrelHelper.SQObjectType.OT_INSTANCE:
+                    return "instance";
+                case SquirrelHelper.SQObjectType.OT_WEAKREF:
+                    return "weakref";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
         }
     }
 }

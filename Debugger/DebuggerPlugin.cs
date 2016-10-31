@@ -242,13 +242,20 @@ namespace Debugger
             }
         }
 
-        public SquirrelFunctions.SQObject Execute(string code, string name, out bool errored)
+        public static IntPtr GetCheckedVM()
         {
             var vm = SquirrelHelper.SquirrelVM;
             if (vm == IntPtr.Zero)
             {
                 throw new SquirrelVMNotPreparedException();
             }
+
+            return vm;
+        }
+
+        public SquirrelFunctions.SQObject Execute(string code, string name, out bool errored)
+        {
+            var vm = GetCheckedVM();
 
             SquirrelFunctions.SQObject ret;
             var func = SquirrelHelper.CompileScriptFunction(code, name);
@@ -266,6 +273,70 @@ namespace Debugger
             SquirrelFunctions.getstackobj(vm, -1, out ret);
             SquirrelFunctions.addref_(vm, ref ret);
             SquirrelFunctions.pop(vm, 2);
+
+            return ret;
+        }
+
+        public Dictionary<string, SquirrelFunctions.SQObject> GetLocalVaribles(int level)
+        {
+            ++level;
+            var vm = GetCheckedVM();
+
+            var ret = new Dictionary<string, SquirrelFunctions.SQObject>();
+            var n = 0;
+            while (true)
+            {
+                var localname = SquirrelFunctions.getlocal(vm, level, n++);
+                if (string.IsNullOrEmpty(localname))
+                {
+                    break;
+                }
+
+                SquirrelFunctions.SQObject obj;
+                SquirrelFunctions.getstackobj(vm, -1, out obj);
+                SquirrelFunctions.addref_(vm, ref obj);
+                SquirrelFunctions.poptop(vm);
+                ret.Add(localname, obj);
+            }
+
+            return ret;
+        }
+
+        public static void DestoryObjectMap(IDictionary<string, SquirrelFunctions.SQObject> map)
+        {
+            if (map == null)
+            {
+                throw new ArgumentNullException(nameof(map));
+            }
+
+            var vm = GetCheckedVM();
+
+            foreach (var objPair in map)
+            {
+                var obj = objPair.Value;
+                SquirrelFunctions.release_(vm, ref obj);
+            }
+
+            map.Clear();
+        }
+
+        public List<SquirrelFunctions.SQStackInfos> GetCallStack()
+        {
+            var vm = GetCheckedVM();
+
+            var ret = new List<SquirrelFunctions.SQStackInfos>();
+
+            var n = 1;
+            while (true)
+            {
+                SquirrelFunctions.RawSQStackInfos rawInfos;
+                if (SquirrelFunctions.stackinfos_(vm, n++, out rawInfos) < 0)
+                {
+                    break;
+                }
+
+                ret.Add(new SquirrelFunctions.SQStackInfos(rawInfos));
+            }
 
             return ret;
         }

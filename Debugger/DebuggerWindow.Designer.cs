@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.btnContinue = new System.Windows.Forms.Button();
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
@@ -37,12 +38,23 @@
             this.btnPause = new System.Windows.Forms.Button();
             this.btnExeToRet = new System.Windows.Forms.Button();
             this.btnInteractive = new System.Windows.Forms.Button();
+            this.lstLocalVar = new System.Windows.Forms.ListView();
+            this.colVarName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colVarValue = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colVarType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.lstCallStack = new System.Windows.Forms.ListBox();
+            this.mnuLocalVar = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.mnuCopyVar = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuCallStack = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.mnuCopyCallStack = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuLocalVar.SuspendLayout();
+            this.mnuCallStack.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnContinue
             // 
             this.btnContinue.Enabled = false;
-            this.btnContinue.Location = new System.Drawing.Point(105, 336);
+            this.btnContinue.Location = new System.Drawing.Point(105, 438);
             this.btnContinue.Name = "btnContinue";
             this.btnContinue.Size = new System.Drawing.Size(83, 41);
             this.btnContinue.TabIndex = 1;
@@ -72,7 +84,7 @@
             // 
             // btnSetBreakPoint
             // 
-            this.btnSetBreakPoint.Location = new System.Drawing.Point(198, 336);
+            this.btnSetBreakPoint.Location = new System.Drawing.Point(198, 438);
             this.btnSetBreakPoint.Name = "btnSetBreakPoint";
             this.btnSetBreakPoint.Size = new System.Drawing.Size(83, 41);
             this.btnSetBreakPoint.TabIndex = 2;
@@ -83,7 +95,7 @@
             // btnStepInto
             // 
             this.btnStepInto.Enabled = false;
-            this.btnStepInto.Location = new System.Drawing.Point(291, 336);
+            this.btnStepInto.Location = new System.Drawing.Point(291, 438);
             this.btnStepInto.Name = "btnStepInto";
             this.btnStepInto.Size = new System.Drawing.Size(83, 41);
             this.btnStepInto.TabIndex = 3;
@@ -94,7 +106,7 @@
             // btnStepOver
             // 
             this.btnStepOver.Enabled = false;
-            this.btnStepOver.Location = new System.Drawing.Point(384, 336);
+            this.btnStepOver.Location = new System.Drawing.Point(384, 438);
             this.btnStepOver.Name = "btnStepOver";
             this.btnStepOver.Size = new System.Drawing.Size(83, 41);
             this.btnStepOver.TabIndex = 4;
@@ -104,7 +116,7 @@
             // 
             // btnPause
             // 
-            this.btnPause.Location = new System.Drawing.Point(12, 336);
+            this.btnPause.Location = new System.Drawing.Point(12, 438);
             this.btnPause.Name = "btnPause";
             this.btnPause.Size = new System.Drawing.Size(83, 41);
             this.btnPause.TabIndex = 0;
@@ -115,7 +127,7 @@
             // btnExeToRet
             // 
             this.btnExeToRet.Enabled = false;
-            this.btnExeToRet.Location = new System.Drawing.Point(477, 336);
+            this.btnExeToRet.Location = new System.Drawing.Point(477, 438);
             this.btnExeToRet.Name = "btnExeToRet";
             this.btnExeToRet.Size = new System.Drawing.Size(83, 41);
             this.btnExeToRet.TabIndex = 5;
@@ -125,7 +137,7 @@
             // 
             // btnInteractive
             // 
-            this.btnInteractive.Location = new System.Drawing.Point(570, 336);
+            this.btnInteractive.Location = new System.Drawing.Point(571, 438);
             this.btnInteractive.Name = "btnInteractive";
             this.btnInteractive.Size = new System.Drawing.Size(83, 41);
             this.btnInteractive.TabIndex = 8;
@@ -133,11 +145,83 @@
             this.btnInteractive.UseVisualStyleBackColor = true;
             this.btnInteractive.Click += new System.EventHandler(this.btnInteractive_Click);
             // 
+            // lstLocalVar
+            // 
+            this.lstLocalVar.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.colVarName,
+            this.colVarValue,
+            this.colVarType});
+            this.lstLocalVar.ContextMenuStrip = this.mnuLocalVar;
+            this.lstLocalVar.Enabled = false;
+            this.lstLocalVar.Location = new System.Drawing.Point(12, 337);
+            this.lstLocalVar.Name = "lstLocalVar";
+            this.lstLocalVar.Size = new System.Drawing.Size(232, 88);
+            this.lstLocalVar.TabIndex = 9;
+            this.lstLocalVar.UseCompatibleStateImageBehavior = false;
+            this.lstLocalVar.View = System.Windows.Forms.View.Details;
+            // 
+            // colVarName
+            // 
+            this.colVarName.Text = "本地变量名";
+            this.colVarName.Width = 90;
+            // 
+            // colVarValue
+            // 
+            this.colVarValue.Text = "值";
+            // 
+            // colVarType
+            // 
+            this.colVarType.Text = "类型";
+            // 
+            // lstCallStack
+            // 
+            this.lstCallStack.ContextMenuStrip = this.mnuCallStack;
+            this.lstCallStack.DisplayMember = "View";
+            this.lstCallStack.Enabled = false;
+            this.lstCallStack.FormattingEnabled = true;
+            this.lstCallStack.ItemHeight = 12;
+            this.lstCallStack.Location = new System.Drawing.Point(250, 337);
+            this.lstCallStack.Name = "lstCallStack";
+            this.lstCallStack.Size = new System.Drawing.Size(404, 88);
+            this.lstCallStack.TabIndex = 10;
+            this.lstCallStack.ValueMember = "View";
+            this.lstCallStack.SelectedIndexChanged += new System.EventHandler(this.lstCallStack_SelectedIndexChanged);
+            // 
+            // mnuLocalVar
+            // 
+            this.mnuLocalVar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mnuCopyVar});
+            this.mnuLocalVar.Name = "mnuLocalVar";
+            this.mnuLocalVar.Size = new System.Drawing.Size(101, 26);
+            // 
+            // mnuCopyVar
+            // 
+            this.mnuCopyVar.Name = "mnuCopyVar";
+            this.mnuCopyVar.Size = new System.Drawing.Size(100, 22);
+            this.mnuCopyVar.Text = "复制";
+            this.mnuCopyVar.Click += new System.EventHandler(this.mnuCopyVar_Click);
+            // 
+            // mnuCallStack
+            // 
+            this.mnuCallStack.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mnuCopyCallStack});
+            this.mnuCallStack.Name = "mnuCallStack";
+            this.mnuCallStack.Size = new System.Drawing.Size(101, 26);
+            // 
+            // mnuCopyCallStack
+            // 
+            this.mnuCopyCallStack.Name = "mnuCopyCallStack";
+            this.mnuCopyCallStack.Size = new System.Drawing.Size(152, 22);
+            this.mnuCopyCallStack.Text = "复制";
+            this.mnuCopyCallStack.Click += new System.EventHandler(this.mnuCopyCallStack_Click);
+            // 
             // DebuggerWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(666, 392);
+            this.ClientSize = new System.Drawing.Size(666, 491);
+            this.Controls.Add(this.lstCallStack);
+            this.Controls.Add(this.lstLocalVar);
             this.Controls.Add(this.btnInteractive);
             this.Controls.Add(this.btnExeToRet);
             this.Controls.Add(this.btnPause);
@@ -152,6 +236,9 @@
             this.Name = "DebuggerWindow";
             this.Text = "DebuggerWindow";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.DebuggerWindow_FormClosing);
+            this.Load += new System.EventHandler(this.DebuggerWindow_Load);
+            this.mnuLocalVar.ResumeLayout(false);
+            this.mnuCallStack.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -168,5 +255,14 @@
         private System.Windows.Forms.Button btnPause;
         private System.Windows.Forms.Button btnExeToRet;
         private System.Windows.Forms.Button btnInteractive;
+        private System.Windows.Forms.ListView lstLocalVar;
+        private System.Windows.Forms.ColumnHeader colVarName;
+        private System.Windows.Forms.ColumnHeader colVarValue;
+        private System.Windows.Forms.ListBox lstCallStack;
+        private System.Windows.Forms.ColumnHeader colVarType;
+        private System.Windows.Forms.ContextMenuStrip mnuLocalVar;
+        private System.Windows.Forms.ToolStripMenuItem mnuCopyVar;
+        private System.Windows.Forms.ContextMenuStrip mnuCallStack;
+        private System.Windows.Forms.ToolStripMenuItem mnuCopyCallStack;
     }
 }

@@ -15,6 +15,7 @@ namespace Debugger
     public partial class Interactive : Form
     {
         private readonly DebuggerWindow _window;
+        public bool ShouldResume { private get; set; } = true;
 
         public Interactive(DebuggerWindow window)
         {
@@ -39,62 +40,8 @@ namespace Debugger
             var ret = _window.Plugin.Execute(code, "Interactive", out errored);
             var msg = new StringBuilder(errored ? "Interactive error: " : ">> ");
 
-            switch (ret.Type)
-            {
-                case SquirrelHelper.SQObjectType.OT_NULL:
-                    msg.Append("null");
-                    break;
-                case SquirrelHelper.SQObjectType.OT_INTEGER:
-                    msg.Append(ret.Value.Integer);
-                    break;
-                case SquirrelHelper.SQObjectType.OT_FLOAT:
-                    msg.Append(ret.Value.Float);
-                    break;
-                case SquirrelHelper.SQObjectType.OT_BOOL:
-                    msg.Append(ret.Value.Integer == 0 ? "false" : "true");
-                    break;
-                case SquirrelHelper.SQObjectType.OT_STRING:
-                    msg.Append($"\"{Marshal.PtrToStringAnsi(ret.Value.Pointer + 28)}\"");
-                    break;
-                case SquirrelHelper.SQObjectType.OT_TABLE:
-                    msg.Append("(table)");
-                    break;
-                case SquirrelHelper.SQObjectType.OT_ARRAY:
-                    msg.Append("(array)");
-                    break;
-                case SquirrelHelper.SQObjectType.OT_USERDATA:
-                    msg.Append("(userdata)");
-                    break;
-                case SquirrelHelper.SQObjectType.OT_CLOSURE:
-                    msg.Append("(closure)");
-                    break;
-                case SquirrelHelper.SQObjectType.OT_NATIVECLOSURE:
-                    msg.Append("(native closure)");
-                    break;
-                case SquirrelHelper.SQObjectType.OT_GENERATOR:
-                    msg.Append("(generator)");
-                    break;
-                case SquirrelHelper.SQObjectType.OT_USERPOINTER:
-                    msg.Append("(userpointer)");
-                    break;
-                case SquirrelHelper.SQObjectType.OT_THREAD:
-                    msg.Append("(thread)");
-                    break;
-                case SquirrelHelper.SQObjectType.OT_FUNCPROTO:
-                    msg.Append("(funcproto)");
-                    break;
-                case SquirrelHelper.SQObjectType.OT_CLASS:
-                    msg.Append("(class)");
-                    break;
-                case SquirrelHelper.SQObjectType.OT_INSTANCE:
-                    msg.Append("(instance)");
-                    break;
-                case SquirrelHelper.SQObjectType.OT_WEAKREF:
-                    msg.Append("(weakref)");
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            var str = ret.ToString();
+            msg.Append(str != string.Empty ? str : $"({ret.Type.GetTypeString()})");
 
             SquirrelFunctions.release_(SquirrelHelper.SquirrelVM, ref ret);
 
@@ -110,9 +57,11 @@ namespace Debugger
             else
             {
                 _window.DebuggerMessageHandler.Enabled = true;
-                _window.DebuggerState = DebuggerWindow.State.Running;
-                _window.SetControlEnabled();
-                _window.Plugin.Resume();
+                if (ShouldResume)
+                {
+                    _window.DebuggerState = DebuggerWindow.State.Running;
+                    _window.DebuggerMessageHandler.Resume();
+                }
             }
         }
     }

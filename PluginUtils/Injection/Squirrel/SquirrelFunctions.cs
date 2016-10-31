@@ -1,6 +1,7 @@
 ﻿using PluginUtils.Injection.Native;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -22,6 +23,61 @@ namespace PluginUtils.Injection.Squirrel
         {
             public SquirrelHelper.SQObjectType Type;
             public SQObjectValue Value;
+
+            public override string ToString()
+            {
+                switch (Type)
+                {
+                    case SquirrelHelper.SQObjectType.OT_NULL:
+                        return "null";
+                    case SquirrelHelper.SQObjectType.OT_INTEGER:
+                        return Value.Integer.ToString();
+                    case SquirrelHelper.SQObjectType.OT_FLOAT:
+                        return Value.Float.ToString(CultureInfo.InvariantCulture);
+                    case SquirrelHelper.SQObjectType.OT_BOOL:
+                        return Value.Integer == 0 ? "false" : "true";
+                    case SquirrelHelper.SQObjectType.OT_STRING:
+                        return $"\"{Marshal.PtrToStringAnsi(Value.Pointer + 28)}\"";
+                    case SquirrelHelper.SQObjectType.OT_TABLE:
+                    case SquirrelHelper.SQObjectType.OT_ARRAY:
+                    case SquirrelHelper.SQObjectType.OT_USERDATA:
+                    case SquirrelHelper.SQObjectType.OT_CLOSURE:
+                    case SquirrelHelper.SQObjectType.OT_NATIVECLOSURE:
+                    case SquirrelHelper.SQObjectType.OT_GENERATOR:
+                    case SquirrelHelper.SQObjectType.OT_USERPOINTER:
+                    case SquirrelHelper.SQObjectType.OT_THREAD:
+                    case SquirrelHelper.SQObjectType.OT_FUNCPROTO:
+                    case SquirrelHelper.SQObjectType.OT_CLASS:
+                    case SquirrelHelper.SQObjectType.OT_INSTANCE:
+                    case SquirrelHelper.SQObjectType.OT_WEAKREF:
+                        return string.Empty;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+
+        public struct RawSQStackInfos
+        {
+            public IntPtr FuncName;
+            public IntPtr Source;
+            public int Line;
+        }
+
+        public struct SQStackInfos
+        {
+            public SQStackInfos(RawSQStackInfos rawinfos)
+            {
+                FuncName = Marshal.PtrToStringAnsi(rawinfos.FuncName);
+                Source = Marshal.PtrToStringAnsi(rawinfos.Source);
+                Line = rawinfos.Line;
+            }
+
+            public string FuncName;
+            public string Source;
+            public int Line;
+
+            public string View => $"{FuncName}({Source}:{Line})";
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -108,11 +164,13 @@ namespace PluginUtils.Injection.Squirrel
         public delegate string Delegate_PI_S(IntPtr arg1, int arg2);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.LPStr)]
-        public delegate string Delegate_PII_S(IntPtr arg1, int arg2, int arg3);
+        public delegate IntPtr Delegate_PII_P(IntPtr arg1, int arg2, int arg3);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int Delegate_PS_I(IntPtr arg1, [MarshalAs(UnmanagedType.LPStr)]string arg2);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate int Delegate_StackInfos(IntPtr arg1, int arg2, out RawSQStackInfos arg3);
 
         public static Delegate_P_V setdebughook = GetFunction<Delegate_P_V>(0x12B630);
 
@@ -189,8 +247,9 @@ namespace PluginUtils.Injection.Squirrel
         public static Delegate_PI_I getsize = GetFunction<Delegate_PI_I>(0x12D9C0);
         public static Delegate_PI_I setdelegate = GetFunction<Delegate_PI_I>(0x12DEE0);
         public static Delegate_PI_I get = GetFunction<Delegate_PI_I>(0x12DFC0);
-        public static Delegate_PII_S getlocal = GetFunction<Delegate_PII_S>(0x12E160);
+        public static Delegate_PII_P getlocal_ = GetFunction<Delegate_PII_P>(0x12E160);
         public static Delegate_PIP_I stackinfos = GetFunction<Delegate_PIP_I>(0x13ABE0);
+        public static Delegate_StackInfos stackinfos_ = GetFunction<Delegate_StackInfos>(0x13ABE0);
         public static Delegate_P_I getlasterror = GetFunction<Delegate_P_I>(0x12BED0);
 
         private static T GetFunction<T>(uint offset)
@@ -204,6 +263,12 @@ namespace PluginUtils.Injection.Squirrel
             var ret = getstring_(vm, stack, out s);
             str = Marshal.PtrToStringAnsi(s);
             return ret;
+        }
+
+        public static string getlocal(IntPtr vm, int level, int n)
+        {
+            var name = getlocal_(vm, level, n);
+            return name == IntPtr.Zero ? null : Marshal.PtrToStringAnsi(name);
         }
 
         //original function require a 8 byte object

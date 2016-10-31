@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Newtonsoft.Json;
 
 namespace Debugger
 {
@@ -177,11 +178,7 @@ namespace Debugger
                 // Apply state
                 if (_window.DebuggerState == State.Breaking)
                 {
-                    ShowLine(srcname, line);
-                    if (Thread.CurrentThread == _window.Invoke((Func<Thread>)(() => Thread.CurrentThread)))
-                        return;
-                    _window.SetControlEnabled();
-                    _window.Plugin.Suspend();
+                    Suspend();
                 }
             }
 
@@ -252,12 +249,83 @@ namespace Debugger
                 {
                     _window.AddMessage($"Unhandled exception detected, description: {exceptiondesc}");
                 }));
+
+                Suspend();
+            }
+
+            public void FlushCallStack()
+            {
+                var callStack = _window.Plugin.GetCallStack();
+                ClearCallStack();
+                _window.Invoke((Action) (() =>
+                {
+                    _window.lstCallStack.Items.AddRange(callStack.Cast<object>().ToArray());
+                    if (_window.lstCallStack.Items.Count > 0)
+                    {
+                        _window.lstCallStack.SelectedIndex = 0;
+                    }
+                }));
+            }
+
+            public void FlushLocalVaribles(int level)
+            {
+                ClearLocalVaribles();
+                var vars = _window.Plugin.GetLocalVaribles(level);
                 
-                ShowLine(_currentSrcName, _currentLine);
-                if (Thread.CurrentThread == _window.Invoke((Func<Thread>) (() => Thread.CurrentThread)))
+                _window.Invoke((Action) (() =>
+                {
+                    _window.lstLocalVar.Tag = vars;
+                    _window.lstLocalVar.Items.AddRange((from item in vars
+                            let varstr = item.Value.ToString()
+                            select new ListViewItem(new []
+                                {item.Key, varstr != string.Empty ? varstr : $"({item.Value.Type.GetTypeString()})", item.Value.Type.GetTypeString()}))
+                        .ToArray());
+                }));
+            }
+
+            public void ClearLocalVaribles()
+            {
+                if (_window.lstLocalVar.Tag == null)
+                {
                     return;
-                _window.DebuggerState = State.Breaking;
+                }
+                
+                DebuggerPlugin.DestoryObjectMap((IDictionary<string, PluginUtils.Injection.Squirrel.SquirrelFunctions.SQObject>) _window.lstLocalVar.Tag);
+                _window.Invoke((Action) (() =>
+                {
+                    _window.lstLocalVar.Tag = null;
+                    _window.lstLocalVar.Items.Clear();
+                }));
+            }
+
+            public void ClearCallStack()
+            {
+                _window.Invoke((Action)(() =>
+                {
+                    _window.lstCallStack.Items.Clear();
+                }));
+            }
+
+            public void Suspend(bool showLine = true)
+            {
+                if (showLine)
+                {
+                    ShowLine(_currentSrcName, _currentLine);
+                }
+                
+                if (Thread.CurrentThread == _window.Invoke((Func<Thread>)(() => Thread.CurrentThread)))
+                    return;
+                _window.SetControlEnabled();
+                FlushCallStack();
                 _window.Plugin.Suspend();
+            }
+
+            public void Resume()
+            {
+                ClearCallStack();
+                ClearLocalVaribles();
+                _window.Plugin.Resume();
+                _window.SetControlEnabled();
             }
         }
 
@@ -280,7 +348,7 @@ namespace Debugger
             }
             else
             {
-                textBox1.Text = (string)listBox1.Items[index];
+                textBox1.Text = (string) listBox1.Items[index];
             }
         }
 
@@ -292,7 +360,7 @@ namespace Debugger
         private void SetControlEnabled(bool value)
         {
             btnPause.Enabled = value;
-            btnContinue.Enabled = btnExeToRet.Enabled = btnStepInto.Enabled = btnStepOver.Enabled = !value;
+            lstCallStack.Enabled = lstLocalVar.Enabled = btnContinue.Enabled = btnExeToRet.Enabled = btnStepInto.Enabled = btnStepOver.Enabled = !value;
         }
 
         public void AddMessage(string msg)
@@ -308,8 +376,7 @@ namespace Debugger
         private void btnContinue_Click(object sender, EventArgs e)
         {
             DebuggerState = State.Running;
-            Plugin.Resume();
-            SetControlEnabled();
+            DebuggerMessageHandler.Resume();
         }
 
         private void btnSetBreakPoint_Click(object sender, EventArgs e)
@@ -320,37 +387,80 @@ namespace Debugger
         private void btnStepInto_Click(object sender, EventArgs e)
         {
             DebuggerState = State.Breaking;
-            Plugin.Resume();
-            SetControlEnabled();
+            DebuggerMessageHandler.Resume();
         }
 
         private void btnStepOver_Click(object sender, EventArgs e)
         {
             DebuggerState = State.StepOver;
-            Plugin.Resume();
-            SetControlEnabled();
+            DebuggerMessageHandler.Resume();
         }
 
         private void btnExeToRet_Click(object sender, EventArgs e)
         {
             DebuggerState = State.BreakReturning;
-            Plugin.Resume();
-            SetControlEnabled();
+            DebuggerMessageHandler.Resume();
         }
         
         private void btnInteractive_Click(object sender, EventArgs e)
         {
-            DebuggerState = State.Breaking;
+            if (DebuggerState == State.Breaking)
+            {
+                _interactive.ShouldResume = false;
+            }
+            else
+            {
+                DebuggerState = State.Breaking;
+                _interactive.ShouldResume = true;
+            }
+            
             _interactive.Show();
         }
 
         private void DebuggerWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (e.CloseReason == CloseReason.UserClosing)
+            DebuggerMessageHandler.Enabled = false;
+            _breakPointSetter.Close();
+            _interactive.Close();
+            DebuggerMessageHandler.Resume();
+        }
+
+        private void lstCallStack_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (lstCallStack.SelectedIndex != -1)
             {
-                e.Cancel = true;
-                Hide();
+                DebuggerMessageHandler.FlushLocalVaribles(lstCallStack.SelectedIndex);
             }
+        }
+
+        private void mnuCopyVar_Click(object sender, EventArgs e)
+        {
+            var items = lstLocalVar.SelectedItems;
+            if (items.Count != 1)
+                return;
+            var item = items[0];
+            Clipboard.SetText(JsonConvert.SerializeObject(new
+            {
+                Name = item.SubItems[0].Text,
+                Value = item.SubItems[1].Text,
+                Type = item.SubItems[2].Text
+            }));
+        }
+
+        private void mnuCopyCallStack_Click(object sender, EventArgs e)
+        {
+            var item = lstCallStack.SelectedItem;
+            if (item == null)
+            {
+                return;
+            }
+
+            Clipboard.SetText(((dynamic) item).View);
+        }
+
+        private void DebuggerWindow_Load(object sender, EventArgs e)
+        {
+            Activate();
         }
     }
 }
