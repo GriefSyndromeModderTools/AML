@@ -64,6 +64,16 @@ namespace Debugger
             _messageHandlers.Add(handler);
         }
 
+        public void UnregisterMessageHandler(IMessageHandler handler)
+        {
+            _messageHandlers.Remove(handler);
+        }
+
+        public void UnregisterAllMessageHandler()
+        {
+            _messageHandlers.Clear();
+        }
+
         public void Init()
         {
             WebRequest.RegisterPrefix("gspack", new GSPackRequestCreate());

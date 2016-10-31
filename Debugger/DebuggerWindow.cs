@@ -423,6 +423,7 @@ namespace Debugger
             _breakPointSetter.Close();
             _interactive.Close();
             DebuggerMessageHandler.Resume();
+            Plugin.UnregisterMessageHandler(DebuggerMessageHandler);
         }
 
         private void lstCallStack_SelectedIndexChanged(object sender, EventArgs e)
