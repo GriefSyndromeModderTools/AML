@@ -65,6 +65,7 @@
             this.Name = "Interactive";
             this.Text = "Interactive";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Interactive_FormClosing);
+            this.VisibleChanged += new System.EventHandler(this.Interactive_VisibleChanged);
             this.ResumeLayout(false);
             this.PerformLayout();
 

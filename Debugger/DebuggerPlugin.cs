@@ -242,7 +242,7 @@ namespace Debugger
             }
         }
 
-        public SquirrelFunctions.SQObject Execute(string code, string name)
+        public SquirrelFunctions.SQObject Execute(string code, string name, out bool errored)
         {
             var vm = SquirrelHelper.SquirrelVM;
             if (vm == IntPtr.Zero)
@@ -254,10 +254,19 @@ namespace Debugger
             var func = SquirrelHelper.CompileScriptFunction(code, name);
             SquirrelFunctions.pushobject(vm, func);
             SquirrelFunctions.pushroottable(vm);
-            SquirrelFunctions.call(vm, 1, 1, 1);
+
+            errored = false;
+
+            if (SquirrelFunctions.call(vm, 1, 1, 0) < 0)
+            {
+                SquirrelFunctions.getlasterror(vm);
+                errored = true;
+            }
+
             SquirrelFunctions.getstackobj(vm, -1, out ret);
             SquirrelFunctions.addref_(vm, ref ret);
             SquirrelFunctions.pop(vm, 2);
+
             return ret;
         }
     }

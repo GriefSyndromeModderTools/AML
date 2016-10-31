@@ -37,7 +37,7 @@ namespace Debugger
                 return _debuggerState;
             }
 
-            private set
+            set
             {
                 _debuggerState = value;
             }
@@ -57,6 +57,8 @@ namespace Debugger
             private string _currentSrcName;
             private int _currentLine;
             private string _currentFuncName;
+
+            public bool Enabled { get; set; } = true;
 
             public MessageHandler(DebuggerWindow window)
             {
@@ -125,6 +127,11 @@ namespace Debugger
                 _currentLine = line;
                 _currentFuncName = funcname;
 
+                if (!Enabled)
+                {
+                    return;
+                }
+
                 // Change state
                 var ctype = (char) type;
                 switch (ctype)
@@ -183,7 +190,11 @@ namespace Debugger
                 string src;
                 if (_sourceMap.TryGetValue(srcname, out src))
                 {
-                    _window.Invoke((Action)(() => { _window.AddMessage($"(Source: {srcname} : {line}){src.GetLine(line)}"); }));
+                    if (src != null)
+                    {
+                        _window.Invoke((Action)(() => { _window.AddMessage($"(Source: {srcname} : {line}){src.GetLine(line)}"); }));
+                    }
+                    
                     return;
                 }
 
@@ -218,6 +229,11 @@ namespace Debugger
 
             public void CompilerExceptionArrived(string exceptiondesc, string srcname, int line, int column)
             {
+                if (!Enabled)
+                {
+                    return;
+                }
+
                 _window.Invoke((Action)(() =>
                 {
                     ShowLine(srcname, line);
@@ -227,6 +243,11 @@ namespace Debugger
 
             public void RuntimeExceptionArrived(string exceptiondesc)
             {
+                if (!Enabled)
+                {
+                    return;
+                }
+
                 _window.Invoke((Action) (() =>
                 {
                     _window.AddMessage($"Unhandled exception detected, description: {exceptiondesc}");
@@ -263,7 +284,7 @@ namespace Debugger
             }
         }
 
-        private void SetControlEnabled()
+        public void SetControlEnabled()
         {
             SetControlEnabled(DebuggerState != State.Breaking);
         }
@@ -319,6 +340,7 @@ namespace Debugger
         
         private void btnInteractive_Click(object sender, EventArgs e)
         {
+            DebuggerState = State.Breaking;
             _interactive.Show();
         }
 

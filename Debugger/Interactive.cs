@@ -35,12 +35,10 @@ namespace Debugger
         {
             var code = txtCode.Text;
             _window.DebuggerMessageHandler.RegisterSource("Interactive", code);
-            /*var task = Task.Run(() => _window.Plugin.Execute(code, "Interactive"));
-            task.Wait();
-            var ret = task.Result;*/
-            var ret = _window.Plugin.Execute(code, "Interactive");
+            bool errored;
+            var ret = _window.Plugin.Execute(code, "Interactive", out errored);
+            var msg = new StringBuilder(errored ? "Interactive error: " : ">> ");
 
-            var msg = new StringBuilder(">> ");
             switch (ret.Type)
             {
                 case SquirrelHelper.SQObjectType.OT_NULL:
@@ -101,6 +99,21 @@ namespace Debugger
             SquirrelFunctions.release_(SquirrelHelper.SquirrelVM, ref ret);
 
             _window.AddMessage(msg.ToString());
+        }
+
+        private void Interactive_VisibleChanged(object sender, EventArgs e)
+        {
+            if (Visible)
+            {
+                _window.DebuggerMessageHandler.Enabled = false;
+            }
+            else
+            {
+                _window.DebuggerMessageHandler.Enabled = true;
+                _window.DebuggerState = DebuggerWindow.State.Running;
+                _window.SetControlEnabled();
+                _window.Plugin.Resume();
+            }
         }
     }
 }

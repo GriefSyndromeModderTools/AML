@@ -191,6 +191,7 @@ namespace PluginUtils.Injection.Squirrel
         public static Delegate_PI_I get = GetFunction<Delegate_PI_I>(0x12DFC0);
         public static Delegate_PII_S getlocal = GetFunction<Delegate_PII_S>(0x12E160);
         public static Delegate_PIP_I stackinfos = GetFunction<Delegate_PIP_I>(0x13ABE0);
+        public static Delegate_P_I getlasterror = GetFunction<Delegate_P_I>(0x12BED0);
 
         private static T GetFunction<T>(uint offset)
         {
