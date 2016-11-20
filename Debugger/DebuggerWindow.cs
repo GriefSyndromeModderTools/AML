@@ -315,7 +315,11 @@ namespace Debugger
                 
                 if (Thread.CurrentThread == _window.Invoke((Func<Thread>)(() => Thread.CurrentThread)))
                     return;
-                _window.SetControlEnabled();
+                _window.Invoke((Action) (() =>
+                {
+                    _window.SetControlEnabled();
+                }));
+                
                 FlushCallStack();
                 _window.Plugin.Suspend();
             }

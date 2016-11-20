@@ -172,6 +172,9 @@ namespace PluginUtils.Injection.Squirrel
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int Delegate_StackInfos(IntPtr arg1, int arg2, out RawSQStackInfos arg3);
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate int Delegate_PIPP_I(IntPtr arg1, int arg2, IntPtr arg3, IntPtr arg4);
+
         public static Delegate_P_V setdebughook = GetFunction<Delegate_P_V>(0x12B630);
 
         public static Delegate_PI_V enabledebuginfo = GetFunction<Delegate_PI_V>(0x12B6A0);
@@ -251,6 +254,10 @@ namespace PluginUtils.Injection.Squirrel
         public static Delegate_PIP_I stackinfos = GetFunction<Delegate_PIP_I>(0x13ABE0);
         public static Delegate_StackInfos stackinfos_ = GetFunction<Delegate_StackInfos>(0x13ABE0);
         public static Delegate_P_I getlasterror = GetFunction<Delegate_P_I>(0x12BED0);
+        public static Delegate_PI_P newuserdata = GetFunction<Delegate_PI_P>(0x12B8C0);
+        public static Delegate_PIP_I setinstanceup = GetFunction<Delegate_PIP_I>(0x12DAB0);
+        public static Delegate_PIPP_I getinstanceup = GetFunction<Delegate_PIPP_I>(0x12DB00);
+        public static Delegate_PI_I bindenv = GetFunction<Delegate_PI_I>(0x12F110);
 
         private static T GetFunction<T>(uint offset)
         {
@@ -276,6 +283,11 @@ namespace PluginUtils.Injection.Squirrel
         public static void pushobject(IntPtr vm, IntPtr pObj)
         {
             var obj = (SQObject) Marshal.PtrToStructure(pObj, typeof(SQObject));
+            pushobject(vm, obj);
+        }
+
+        public static void pushobject(IntPtr vm, SQObject obj)
+        {
             pushobject_(vm, obj.Type, obj.Value);
         }
 

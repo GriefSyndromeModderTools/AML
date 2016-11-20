@@ -33,6 +33,9 @@ namespace Debugger
             IntPtr vm, [MarshalAs(UnmanagedType.LPStr)] string exceptiondesc,
             [MarshalAs(UnmanagedType.LPStr)] string srcname, int line, int column);
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate int ReleaseHook(IntPtr userdata, int size);
+
         public class Config
         {
             public Uri[] SourceUri { get; set; } = null;
@@ -119,6 +122,38 @@ namespace Debugger
             SquirrelHelper.Run(vm =>
             {
                 SquirrelFunctions.enabledebuginfo(vm, 1);
+
+                SquirrelHelper.RegisterGlobalFunction("RegisterFinalizable", sqvm =>
+                {
+                    SquirrelFunctions.SQObject obj;
+                    SquirrelFunctions.getstackobj(sqvm, -1, out obj);
+                    SquirrelFunctions.setreleasehook(sqvm, -1, Marshal.GetFunctionPointerForDelegate((ReleaseHook)(
+                            (userdata, size) =>
+                            {
+                                SquirrelFunctions.pushobject(sqvm, obj);
+                                SquirrelFunctions.pushstring(sqvm, "Finalize", -1);
+                                SquirrelFunctions.get(sqvm, -2);
+                                SquirrelFunctions.pushobject(sqvm, obj);
+                                SquirrelFunctions.call(sqvm, 1, 0, 0);
+                                SquirrelFunctions.pop(sqvm, 2);
+
+                                return 0;
+                            })));
+
+                    return 0;
+                });
+
+                var CreateIFinalizable = SquirrelHelper.CompileScriptFunction(
+                  @"class IFinalizable
+                    {
+                        constructor() { RegisterFinalizable(this); }
+                        function Finalize() {}
+                        function _inherited(attributes) {}
+                    }", "CreateIFinalizable");
+                SquirrelFunctions.pushobject(vm, CreateIFinalizable);
+                SquirrelFunctions.pushroottable(vm);
+                SquirrelFunctions.call(vm, 1, 0, 0);
+                SquirrelFunctions.pop(vm, 1);
 
                 SquirrelHelper.InjectCompileFileMain("data/script/boot.nut").AddBefore(sqvm =>
                 {
