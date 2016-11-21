@@ -16,7 +16,7 @@ namespace PluginUtils.Injection.Squirrel
         private List<InjectedScriptDelegate> _Before = new List<InjectedScriptDelegate>();
         private List<InjectedScriptDelegate> _After = new List<InjectedScriptDelegate>();
 
-        internal int Invoke(IntPtr vm, int nargs, int original1, int original2)
+        internal int Invoke(IntPtr vm, int nargs, SquirrelHelper.SQObjectType original1, SquirrelFunctions.SQObjectValue original2)
         {
             foreach (var d in _Before)
             {

@@ -31,7 +31,7 @@ namespace PluginUtils
             {
                 throw new InvalidOperationException();
             }
-            return _Manager.GetPlguin<T>();
+            return _Manager.GetPlugin<T>();
         }
     }
 }
