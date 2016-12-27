@@ -1,49 +1,22 @@
-﻿using AGSO.Core.Common;
-using PluginUtils;
-using PluginUtils.Injection.File;
-using PluginUtils.Injection.Native;
+﻿using PluginUtils.Injection.Native;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AGSO.Core.Input
+namespace PluginUtils.Injection.Input
 {
     class InputInjectorPlugin : IAMLPlugin
     {
         public void Init()
         {
-            WindowsHelper.MessageBox("input");
             new InjectCoCreateInstance().InjectSelf();
-            InputHandler.InitInputHandler();
-            if (InputHandler.ReplayLoaded)
-            {
-                InputHandler.KeyConfig = GetKeyCodeList();
-                FileReplacement.RegisterFile(Path.GetFullPath("keyconfig.dat"), new KeyConfigFile());
-            }
-            else
-            {
-                var keyconfigData = File.ReadAllBytes(PathHelper.GetPath("keyconfig.dat"));
-                InputHandler.KeyConfig = new int[9 * 3];
-                Buffer.BlockCopy(keyconfigData, 0, InputHandler.KeyConfig, 0, 9 * 3 * 4);
-            }
         }
 
         public void Load()
         {
-        }
-
-        private static int[] GetKeyCodeList()
-        {
-            var ret = new int[9 * 3];
-            for (int i = 0; i < ret.Length; ++i)
-            {
-                ret[i] = i + 30;
-            }
-            return ret;
         }
 
         private class InjectCoCreateInstance : NativeWrapper
@@ -147,9 +120,8 @@ namespace AGSO.Core.Input
 
                 Marshal.Copy(_Zero, 0, p2, p1);
 
-                if (p0 == _InjectedInstance && InputHandler.ReplayLoaded)
+                if (p0 == _InjectedInstance && InputManager.HandleAll(p2))
                 {
-                    Common.InputHandler.Aquire(p2);
                     env.SetReturnValue(0);
                 }
                 else
@@ -161,15 +133,5 @@ namespace AGSO.Core.Input
 
             private static readonly byte[] _Zero = new byte[0x100];
         }
-
-        private class KeyConfigFile : CachedModificationFileProxyFactory
-        {
-            public override byte[] Modify(byte[] data)
-            {
-                Buffer.BlockCopy(InputHandler.KeyConfig, 0, data, 0, 9 * 3 * 4);
-                return data;
-            }
-        }
-
     }
 }

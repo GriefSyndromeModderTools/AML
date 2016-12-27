@@ -10,7 +10,7 @@ namespace NetworkTest
 {
     class ConnectionTest
     {
-        static void Main()
+        static void Main1()
         {
             Console.WriteLine("c/s:");
             if (Console.ReadKey().Key == ConsoleKey.C)

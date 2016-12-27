@@ -1,5 +1,4 @@
-﻿using AGSO.Core.Common;
-using PluginUtils;
+﻿using PluginUtils;
 using PluginUtils.Injection.Native;
 using System;
 using System.Collections.Generic;

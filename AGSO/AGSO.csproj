@@ -39,10 +39,11 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="zlib.net">
+      <HintPath>..\packages\zlib.net.1.0.4.0\lib\zlib.net.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\Common\InputHandler.cs" />
-    <Compile Include="Core\FP\FPCode.cs" />
     <Compile Include="Core\GSO\GSOHelper.cs" />
     <Compile Include="Core\GSO\NetworkListener.cs" />
     <Compile Include="Core\GSO\NetworkListenerForm.cs">
@@ -51,12 +52,12 @@
     <Compile Include="Core\GSO\NetworkListenerForm.Designer.cs">
       <DependentUpon>NetworkListenerForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Core\Input\InputInjectorPlugin.cs" />
+    <Compile Include="Core\Input\ReplayInputHandler.cs" />
     <Compile Include="Misc\GameWindowTitleFix.cs" />
     <Compile Include="Misc\GSO2ReplayFile.cs" />
+    <Compile Include="Misc\StartupLapFix.cs" />
     <Compile Include="Network\Buffer.cs" />
     <Compile Include="Network\Connection.cs" />
-    <Compile Include="Network\GameSide.cs" />
     <Compile Include="Network\NetworkException.cs" />
     <Compile Include="Network\WinSock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -75,6 +76,9 @@
     <EmbeddedResource Include="Core\GSO\NetworkListenerForm.resx">
       <DependentUpon>NetworkListenerForm.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

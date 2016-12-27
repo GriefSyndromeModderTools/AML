@@ -38,6 +38,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="zlib.net">
+      <HintPath>..\packages\zlib.net.1.0.4.0\lib\zlib.net.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IAMLPlugin.cs" />
@@ -49,12 +52,19 @@
     <Compile Include="Injection\File\IFileProxy.cs" />
     <Compile Include="Injection\File\FileReplacement.cs" />
     <Compile Include="Injection\File\SimpleFileProxy.cs" />
+    <Compile Include="Injection\Input\FPCtrl.cs" />
+    <Compile Include="Injection\Input\IInputHandler.cs" />
+    <Compile Include="Injection\Input\InputInjectorPlugin.cs" />
+    <Compile Include="Injection\Input\InputManager.cs" />
     <Compile Include="Injection\Native\AddressHelper.cs" />
     <Compile Include="Injection\Native\AssemblyCodeStorage.cs" />
     <Compile Include="Injection\Native\CodeModification.cs" />
     <Compile Include="Injection\Native\NativeEntrance.cs" />
     <Compile Include="Injection\Native\NativeFunctions.cs" />
     <Compile Include="Injection\Native\NativeWrapper.cs" />
+    <Compile Include="Injection\SaveData\GSDataFile.cs" />
+    <Compile Include="Injection\SaveData\SaveDataHelper.cs" />
+    <Compile Include="Injection\SaveData\SaveDataInjector.cs" />
     <Compile Include="Injection\Squirrel\CompileFileInjectionManager.cs" />
     <Compile Include="Injection\Squirrel\CompileFileInjectorPlugin.cs" />
     <Compile Include="Injection\Squirrel\InjectedScriptFunction.cs" />
@@ -72,7 +82,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WindowsHelper.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

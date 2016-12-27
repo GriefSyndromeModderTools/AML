@@ -83,14 +83,14 @@ namespace AGSO.Network
             WinSock.closesocket(_Socket);
         }
 
-        public void UpdateRemoteList(long time)
+        public void UpdateRemoteList(long receiveTimeout, long activeTimeout)
         {
-            long removeSend = _Clock.ElapsedMilliseconds - time;
+            long removeSend = _Clock.ElapsedMilliseconds - receiveTimeout;
             _ToRemove.Clear();
             foreach (var e in _RemoteList)
             {
-                if (e.Value.LastReceived < e.Value.LastSend &&
-                    e.Value.LastSend < removeSend)
+                if (e.Value.LastReceived < e.Value.LastSend && e.Value.LastSend < removeSend ||
+                    e.Value.LastSend < activeTimeout && e.Value.LastReceived < activeTimeout)
                 {
                     _ToRemove.Add(e.Key);
                 }
