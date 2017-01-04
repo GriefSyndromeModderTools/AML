@@ -13,11 +13,6 @@ namespace AGSO.Core.Connection
 {
     class Server
     {
-        private class ClientInputData
-        {
-
-        }
-
         public class ClientInfo
         {
             public Remote Remote;
@@ -108,6 +103,7 @@ namespace AGSO.Core.Connection
                 return;
             }
             _Clients.Remove((ClientInfo)r.Data);
+            ConnectionSelectForm.Log("[D] Client " + _Clients.Count);
             r.ReceiveCount = 0;
         }
 
@@ -126,6 +122,17 @@ namespace AGSO.Core.Connection
                 var type = (PacketType)_Parent._Connection.Buffer.ReadByte();
                 switch (type)
                 {
+                    case PacketType.None:
+                        //empty packet
+                        r.ReceiveCount -= 1;
+                        {
+                            var buffer = _Parent._Connection.Buffer;
+                            buffer.Reset(0);
+                            buffer.WriteByte((byte)PacketType.None);
+                            buffer.WriteSum();
+                            _Parent._Connection.Send(r);
+                        }
+                        return;
                     case PacketType.NewConnection:
                         if (r.ReceiveCount == 1)
                         {
@@ -137,7 +144,8 @@ namespace AGSO.Core.Connection
                             //just reply
                             SendStatus(r);
 
-                            ConnectionSelectForm.Log("New client");
+                            ConnectionSelectForm.Log("New client " + r.ToString());
+                            ConnectionSelectForm.Log("[A] Client " + _Parent._Clients.Count);
                             return;
                         }
                         break;
@@ -148,7 +156,8 @@ namespace AGSO.Core.Connection
                             //we don't need any information, just reply
                             SendStatus(r);
 
-                            ConnectionSelectForm.Log("Client status");
+                            ConnectionSelectForm.Log("Client status " + r.ToString());
+                            ConnectionSelectForm.Log("[B] Client " + _Parent._Clients.Count);
                             return;
                         }
                         break;
@@ -175,6 +184,7 @@ namespace AGSO.Core.Connection
                         {
                             _Parent._Clients.RemoveAt(i);
                             i -= 1;
+                            ConnectionSelectForm.Log("[C] Client " + _Parent._Clients.Count);
                         }
                     }
                 }
@@ -203,6 +213,7 @@ namespace AGSO.Core.Connection
             public void OnStart()
             {
                 Parent._Interval = 1;
+                ConnectionSelectForm.Log("[E] Client " + Parent._Clients.Count);
                 for (int i = 0; i < Parent._Clients.Count; ++i)
                 {
                     Parent._Clients[i].PlayerIndex = i + 1;
@@ -211,6 +222,8 @@ namespace AGSO.Core.Connection
                     Parent._Connection.Buffer.WriteByte((byte)PacketType.GameStart);
                     Parent._Connection.Buffer.WriteSum();
                     Parent._Connection.Send(Parent._Clients[i].Remote);
+
+                    ConnectionSelectForm.Log("Inform " + Parent._Clients[i].Remote.ToString() + "...");
                 }
                 var client = new ClientInfo[3];
 
@@ -221,9 +234,10 @@ namespace AGSO.Core.Connection
 
                 Parent._InputHandler = new NetworkServerInputHandler(client, 0);
                 InputManager.RegisterHandler(Parent._InputHandler);
+
             }
 
-            private byte[] _ByteBuffer = new byte[9];
+            private byte[] _ByteBuffer = new byte[10];
 
             public void OnPacket(Remote r)
             {
@@ -234,6 +248,7 @@ namespace AGSO.Core.Connection
                         //TODO
                         return;
                     case PacketType.ClientReady:
+                        ConnectionSelectForm.Log("Ready " + r.ToString());
                         _Ready[RemoteIndex(r)] = true;
                         if (_Ready.All(rr => rr))
                         {

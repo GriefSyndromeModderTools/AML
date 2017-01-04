@@ -16,16 +16,187 @@ namespace AGSO.Core.Connection
 {
     class NetworkServerInputHandler : IInputHandler
     {
+        public const int InitEmptyCount = 3;
+
+        private class ServerPlayerSequenceHandler : SequenceHandler
+        {
+            public ServerPlayerSequenceHandler() :
+                base(10)
+            {
+                for (int i = 0; i < InitEmptyCount; ++i)
+                {
+                    this.ReceiveEmpty(15);
+                }
+            }
+
+            protected override bool CheckInterpolate(byte length, byte a, byte b)
+            {
+                return length < 10;
+            }
+
+            protected override byte Interpolate(byte length, byte t, byte a, byte b)
+            {
+                var aa = new ByteData(a);
+                var bb = new ByteData(b);
+                if (aa.Change == bb.Change)
+                {
+                    //a + t
+                    if (aa.Frame + t >= 15)
+                    {
+                        aa.Frame = 15;
+                    }
+                    else
+                    {
+                        aa.Frame = (byte)(aa.Frame + t);
+                    }
+                    return aa.Data;
+                }
+                if (((aa.Change + 1) & 7) == bb.Change && bb.Frame != 15)
+                {
+                    if (t + bb.Frame >= length)
+                    {
+                        //b - (length - t)
+                        bb.Frame -= (byte)(length - t);
+                        return bb.Data;
+                    }
+                    else
+                    {
+                        //a + t
+                        if (aa.Frame + t >= 15)
+                        {
+                            aa.Frame = 15;
+                        }
+                        else
+                        {
+                            aa.Frame = (byte)(aa.Frame + t);
+                        }
+                        return aa.Data;
+                    }
+                }
+                //a + t
+                if (aa.Frame + t >= 15)
+                {
+                    aa.Frame = 15;
+                }
+                else
+                {
+                    aa.Frame = (byte)(aa.Frame + t);
+                }
+                return aa.Data;
+            }
+
+            protected override void WaitFor(byte time)
+            {
+            }
+
+            protected override void ResetAll(long time)
+            {
+            }
+        }
+
+        private Server.ClientInfo[] _Remote;
+        private int _PlayerIndex; //Server
+        private int _Ready;
+        private SequenceHandler[] _ClientData = new SequenceHandler[3];
+        private ServerMerger _Merger;
+        private ClientRecorder _Client = new ClientRecorder(InitEmptyCount);
+        private ClientSequenceHandler _ClientSequence = new ClientSequenceHandler();
+
+        public NetworkServerInputHandler(Server.ClientInfo[] r, int playerIndex)
+        {
+            KeyConfigInjector.Inject();
+            _Remote = r;
+            _PlayerIndex = playerIndex;
+
+            for (int i = 0; i < 3; ++i)
+            {
+                _ClientData[i] = new ServerPlayerSequenceHandler();
+            }
+
+            _Merger = new ServerMerger(_ClientData);
+
+            for (int i = 0; i < InitEmptyCount; ++i)
+            {
+                _Merger.DoMerge();
+            }
+        }
+
+        public void AllReady()
+        {
+            _Ready = 1;
+        }
+
+        public void ReceiveNetworkData(int id, byte[] data)
+        {
+            _ClientData[id].Receive(data);
+        }
+
+        public void SendNetworkData(Conn conn)
+        {
+            byte[] d;
+            while (_Merger.TryDequeue(out d))
+            {
+                foreach (var c in _Remote)
+                {
+                    if (c != null)
+                    {
+                        conn.Buffer.Reset(0);
+                        conn.Buffer.WriteByte((byte)PacketType.ServerInputData);
+                        conn.Buffer.WriteBytes(d);
+                        conn.Buffer.WriteSum();
+                        conn.Send(c.Remote);
+                    }
+                }
+                _ClientSequence.Receive(d);
+            }
+        }
+
+        public bool HandleInput(IntPtr ptr)
+        {
+            if (_Ready != 2)
+            {
+                while (_Ready == 0)
+                {
+                    Thread.Sleep(1);
+                }
+                _Ready = 2;
+            }
+            _ClientData[_PlayerIndex].Receive(_Client.Convert(ptr));
+            for (int i = 0; i < 3; ++i)
+            {
+                if (i != _PlayerIndex && _Remote[i] == null)
+                {
+                    _ClientData[i].ReceiveEmpty(15);
+                }
+            }
+            _Merger.DoMerge();
+
+            SetInputData(ptr, _ClientSequence.Next());
+
+            return true;
+        }
+
+        private void SetInputData(IntPtr ptr, byte[] data)
+        {
+            for (int i = 0; i < 27; ++i)
+            {
+                bool k = (data[i + 1] & 128) != 0;
+                Marshal.WriteByte(ptr, KeyConfig.GetInjectedKeyIndex(i), (byte)(k ? 0x80 : 0));
+            }
+        }
+    }
+    class NetworkServerInputHandler_ : IInputHandler
+    {
         private class ClientInputQueue
         {
             private ConcurrentQueue<byte[]> _Queue = new ConcurrentQueue<byte[]>();
-            private NetworkServerInputHandler _Parent;
+            private NetworkServerInputHandler_ _Parent;
             private byte _LastTime;
 
             private int _Skip;
             private byte[] _SkipData;
 
-            public ClientInputQueue(NetworkServerInputHandler parent)
+            public ClientInputQueue(NetworkServerInputHandler_ parent)
             {
                 _Parent = parent;
                 _LastTime = 255;
@@ -102,7 +273,7 @@ namespace AGSO.Core.Connection
 
         private ConcurrentQueue<byte[]> _SendQueue = new ConcurrentQueue<byte[]>();
 
-        public NetworkServerInputHandler(Server.ClientInfo[] r, int playerIndex)
+        public NetworkServerInputHandler_(Server.ClientInfo[] r, int playerIndex)
         {
             KeyConfigInjector.Inject();
 

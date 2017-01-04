@@ -14,7 +14,71 @@ using KeyConfig = AGSO.Core.Input.KeyConfigInjector;
 
 namespace AGSO.Core.Connection
 {
-    class NetworkClientInputHandler : IInputHandler
+    class NetworkClientInputHandler : ClientSequenceHandler, IInputHandler
+    {
+        private volatile int _Ready;
+        private ClientRecorder _Recorder = new ClientRecorder(NetworkServerInputHandler.InitEmptyCount);
+
+        public NetworkClientInputHandler()
+        {
+            KeyConfigInjector.Inject();
+        }
+
+        public bool HandleInput(IntPtr ptr)
+        {
+            if (_Ready == 0)
+            {
+                _Ready = 1;
+            }
+            _Recorder.Enqueue(ptr);
+            SetInputData(ptr, this.Next());
+            return true;
+        }
+
+        private void SetInputData(IntPtr ptr, byte[] data)
+        {
+            for (int i = 0; i < 27; ++i)
+            {
+                bool k = (data[i + 1] & 128) != 0;
+                Marshal.WriteByte(ptr, KeyConfig.GetInjectedKeyIndex(i), (byte)(k ? 0x80 : 0));
+            }
+        }
+
+        public void ReceiveNetworkData(byte[] data)
+        {
+            this.Receive(data);
+        }
+
+        public void SendNetworkData(Conn conn, Remote r)
+        {
+            if (_Ready == 1)
+            {
+                _Ready = 2;
+                conn.Buffer.Reset(0);
+                conn.Buffer.WriteByte((byte)PacketType.ClientReady);
+                conn.Buffer.WriteSum();
+                conn.Send(r);
+            }
+            byte[] cdata;
+            while (_Recorder.TryDequeue(out cdata))
+            {
+                conn.Buffer.Reset(0);
+                conn.Buffer.WriteByte((byte)PacketType.ClientInputData);
+                conn.Buffer.WriteBytes(cdata);
+                conn.Buffer.WriteSum();
+                conn.Send(r);
+            }
+        }
+
+        protected override void WaitFor(byte time)
+        {
+        }
+
+        protected override void ResetAll(long time)
+        {
+        }
+    }
+    class NetworkClientInputHandler_ : IInputHandler
     {
         //0: not ready and signal not sent. 1: ready but signal not sent. 2: ready and signal sent
         private volatile int _Ready;
@@ -39,7 +103,7 @@ namespace AGSO.Core.Connection
         //last client data. used to calculate time since last key change.
         private readonly byte[] _CurrentClient = new byte[9 + 1];
 
-        public NetworkClientInputHandler()
+        public NetworkClientInputHandler_()
         {
             KeyConfigInjector.Inject();
 

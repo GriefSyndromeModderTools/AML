@@ -44,7 +44,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Connection\ByteData.cs" />
     <Compile Include="Core\Connection\Client.cs" />
+    <Compile Include="Core\Connection\ClientRecorder.cs" />
+    <Compile Include="Core\Connection\ClientSequenceHandler.cs" />
     <Compile Include="Core\Connection\ConnectionSelectForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -57,6 +60,7 @@
     <Compile Include="Core\Connection\PacketType.cs" />
     <Compile Include="Core\Connection\SequenceHandler.cs" />
     <Compile Include="Core\Connection\Server.cs" />
+    <Compile Include="Core\Connection\ServerMerger.cs" />
     <Compile Include="Core\GSO\GSOHelper.cs" />
     <Compile Include="Core\GSO\NetworkListener.cs" />
     <Compile Include="Core\GSO\NetworkListenerForm.cs">

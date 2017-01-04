@@ -92,15 +92,18 @@ namespace AGSO.Core.Connection
             public string Ip;
             public int Port;
             private int _TickCount = 0;
+            private bool _Replied;
 
             public void OnStart()
             {
                 Parent._Interval = 10;
 
                 Parent._Connection.Buffer.Reset(0);
-                Parent._Connection.Buffer.WriteByte((byte)PacketType.NewConnection);
+                Parent._Connection.Buffer.WriteByte((byte)PacketType.None);
                 Parent._Connection.Buffer.WriteSum();
                 Parent._Server = Parent._Connection.Send(Ip, Port);
+
+                Thread.Sleep(2000);
             }
 
             public void OnPacket(Remote r)
@@ -110,6 +113,17 @@ namespace AGSO.Core.Connection
                     var type = (PacketType)Parent._Connection.Buffer.ReadByte();
                     switch (type)
                     {
+                        case PacketType.None:
+                            if (!_Replied)
+                            {
+                                Parent._Connection.Buffer.Reset(0);
+                                Parent._Connection.Buffer.WriteByte((byte)PacketType.NewConnection);
+                                Parent._Connection.Buffer.WriteSum();
+                                Parent._Server = Parent._Connection.Send(Ip, Port);
+
+                                _Replied = true;
+                            }
+                            return;
                         case PacketType.ServerStatus:
                             ConnectionSelectForm.Log("Server status");
                             return;
@@ -125,17 +139,30 @@ namespace AGSO.Core.Connection
 
             public void OnTick()
             {
-                if (++_TickCount >= 50)
+                if (!_Replied)
                 {
-                    _TickCount = 0;
-                    Parent._Connection.Buffer.Reset(0);
-                    Parent._Connection.Buffer.WriteByte((byte)PacketType.ClientStatus);
-                    Parent._Connection.Buffer.WriteSum();
-                    Parent._Connection.Send(Parent._Server);
-                    if (!Parent._Connection.UpdateRemoteList(Parent._Server, 1000 * 5, 1000 * 20))
+                    if (++_TickCount >= 200)
                     {
-                        ConnectionSelectForm.Log("Close");
-                        Parent.Stop();
+                        Parent._Connection.Buffer.Reset(0);
+                        Parent._Connection.Buffer.WriteByte((byte)PacketType.None);
+                        Parent._Connection.Buffer.WriteSum();
+                        Parent._Connection.Send(Parent._Server);
+                    }
+                }
+                else
+                {
+                    if (++_TickCount >= 50)
+                    {
+                        _TickCount = 0;
+                        Parent._Connection.Buffer.Reset(0);
+                        Parent._Connection.Buffer.WriteByte((byte)PacketType.ClientStatus);
+                        Parent._Connection.Buffer.WriteSum();
+                        Parent._Connection.Send(Parent._Server);
+                        if (!Parent._Connection.UpdateRemoteList(Parent._Server, 1000 * 5, 1000 * 20))
+                        {
+                            ConnectionSelectForm.Log("Close");
+                            Parent.Stop();
+                        }
                     }
                 }
             }

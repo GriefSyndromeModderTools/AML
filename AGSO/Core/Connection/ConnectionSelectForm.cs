@@ -25,10 +25,13 @@ namespace AGSO.Core.Connection
 
         public static void Log(string msg)
         {
-            _Instance.Invoke((Action)delegate()
+            if (!_Instance.IsDisposed && _Instance.Visible)
             {
-                _Instance.textBox3.AppendText(msg + "\n");
-            });
+                _Instance.Invoke((Action)delegate()
+                {
+                    _Instance.textBox3.AppendText(msg + "\n");
+                });
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -60,10 +63,13 @@ namespace AGSO.Core.Connection
 
         public static void CloseWindow()
         {
-            _Instance.Invoke((Action)delegate()
+            if (!_Instance.IsDisposed && _Instance.Visible)
             {
-                _Instance.Close();
-            });
+                _Instance.Invoke((Action)delegate()
+                {
+                    _Instance.Close();
+                });
+            }
         }
     }
 }

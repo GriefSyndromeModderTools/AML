@@ -24,6 +24,9 @@ namespace AGSO.Core.Connection
 
         private byte _NextTime;
         private long _NextTimeLong;
+        private byte _LastEnqueueTime = 255;
+
+        private byte[] _Empty;
 
         public SequenceHandler(int bufferLength)
         {
@@ -34,6 +37,7 @@ namespace AGSO.Core.Connection
                 _BufferPool.Enqueue(new byte[_BufferLength]);
             }
             _LastReturned = new byte[_BufferLength];
+            _Empty = new byte[_BufferLength];
         }
 
         private byte[] GetFromPool()
@@ -53,6 +57,18 @@ namespace AGSO.Core.Connection
         public void Receive(byte[] data)
         {
             _InputQueue.Enqueue(Copy(data));
+            _LastEnqueueTime = data[0];
+        }
+
+        public void ReceiveEmpty(byte data)
+        {
+            _Empty[0] = Inc(_LastEnqueueTime);
+            for (int i = 1; i < _BufferLength; ++i)
+            {
+                _Empty[i] = data;
+            }
+
+            Receive(_Empty);
         }
 
         public byte[] Next()

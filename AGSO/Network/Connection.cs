@@ -23,6 +23,13 @@ namespace AGSO.Network
             LastSend = time;
             LastReceived = time;
         }
+
+        public override string ToString()
+        {
+            var addr = BitConverter.GetBytes(Address.sin_addr);
+            var port = BitConverter.GetBytes(Address.sin_port);
+            return string.Format("{0}.{1}.{2}.{3}:{4}", addr[0], addr[1], addr[2], addr[3], port[0] << 8 | port[1]);
+        }
     }
 
     public class Connection
