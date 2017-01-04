@@ -55,6 +55,7 @@
     <Compile Include="Core\Connection\NetworkManager.cs" />
     <Compile Include="Core\Connection\NetworkServerInputHandler.cs" />
     <Compile Include="Core\Connection\PacketType.cs" />
+    <Compile Include="Core\Connection\SequenceHandler.cs" />
     <Compile Include="Core\Connection\Server.cs" />
     <Compile Include="Core\GSO\GSOHelper.cs" />
     <Compile Include="Core\GSO\NetworkListener.cs" />

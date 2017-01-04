@@ -32,7 +32,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>NetworkTest.ConnectFormTest</StartupObject>
+    <StartupObject>NetworkTest.NetworkQueueTest</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -48,6 +48,7 @@
     <Compile Include="ConnectFormTest.cs" />
     <Compile Include="ConnectionTest.cs" />
     <Compile Include="GSDataFileTest.cs" />
+    <Compile Include="NetworkQueueTest.cs" />
     <Compile Include="SocketTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
