@@ -14,7 +14,6 @@ namespace AGSO.Core.Input
     class ReplayInputHandler : IAMLPlugin, IInputHandler
     {
         private static ushort[] _Rep;
-        private int[] _KeyConfig;
         private static int _RepOffset;
 
         private static readonly ushort[] _Mask = new ushort[] {
@@ -33,9 +32,7 @@ namespace AGSO.Core.Input
                         var rep = new Misc.GSO2ReplayFile(dialog.FileName);
                         _Rep = rep.InputData;
 
-                        _KeyConfig = GetKeyCodeList();
-                        FileReplacement.RegisterFile(Path.GetFullPath("keyconfig.dat"),
-                            new KeyConfigFile { KeyConfig = _KeyConfig });
+                        KeyConfigInjector.Inject();
 
                         InputManager.RegisterHandler(this);
                     }
@@ -68,37 +65,20 @@ namespace AGSO.Core.Input
                 var pp = p;
                 for (int k = 0; k < 9; ++k)
                 {
-                    var dik = _KeyConfig[pp * 9 + k];
+                    var dik = KeyConfigInjector.GetInjectedKeyIndex(pp * 9 + k);
                     if ((_Rep[playerOffset] & _Mask[k]) != 0)
                     {
                         Marshal.WriteByte(ptr, dik, 0x80);
+                    }
+                    else
+                    {
+                        Marshal.WriteByte(ptr, dik, 0x0);
                     }
                 }
             }
 
             _RepOffset += 3;
             return true;
-        }
-
-        private static int[] GetKeyCodeList()
-        {
-            var ret = new int[9 * 3];
-            for (int i = 0; i < ret.Length; ++i)
-            {
-                ret[i] = i + 30;
-            }
-            return ret;
-        }
-
-        private class KeyConfigFile : CachedModificationFileProxyFactory
-        {
-            public int[] KeyConfig;
-
-            public override byte[] Modify(byte[] data)
-            {
-                Buffer.BlockCopy(KeyConfig, 0, data, 0, 9 * 3 * 4);
-                return data;
-            }
         }
     }
 }

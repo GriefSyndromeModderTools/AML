@@ -44,6 +44,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Connection\Client.cs" />
+    <Compile Include="Core\Connection\ConnectionSelectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Core\Connection\ConnectionSelectForm.Designer.cs">
+      <DependentUpon>ConnectionSelectForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Core\Connection\NetworkClientInputHandler.cs" />
+    <Compile Include="Core\Connection\NetworkManager.cs" />
+    <Compile Include="Core\Connection\NetworkServerInputHandler.cs" />
+    <Compile Include="Core\Connection\PacketType.cs" />
+    <Compile Include="Core\Connection\Server.cs" />
     <Compile Include="Core\GSO\GSOHelper.cs" />
     <Compile Include="Core\GSO\NetworkListener.cs" />
     <Compile Include="Core\GSO\NetworkListenerForm.cs">
@@ -52,9 +64,11 @@
     <Compile Include="Core\GSO\NetworkListenerForm.Designer.cs">
       <DependentUpon>NetworkListenerForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Core\Input\KeyConfigInjector.cs" />
     <Compile Include="Core\Input\ReplayInputHandler.cs" />
     <Compile Include="Misc\GameWindowTitleFix.cs" />
     <Compile Include="Misc\GSO2ReplayFile.cs" />
+    <Compile Include="Misc\MultipleProcessFix.cs" />
     <Compile Include="Misc\StartupLapFix.cs" />
     <Compile Include="Network\Buffer.cs" />
     <Compile Include="Network\Connection.cs" />
@@ -69,10 +83,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Core\Connection\" />
     <Folder Include="Core\Render\" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Core\Connection\ConnectionSelectForm.resx">
+      <DependentUpon>ConnectionSelectForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Core\GSO\NetworkListenerForm.resx">
       <DependentUpon>NetworkListenerForm.cs</DependentUpon>
     </EmbeddedResource>

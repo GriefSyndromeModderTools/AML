@@ -1,0 +1,272 @@
+﻿using AGSO.Network;
+using PluginUtils.Injection.Input;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Conn = AGSO.Network.Connection;
+
+namespace AGSO.Core.Connection
+{
+    class Server
+    {
+        private class ClientInputData
+        {
+
+        }
+
+        public class ClientInfo
+        {
+            public Remote Remote;
+            public int PlayerIndex;
+        }
+
+        private interface IServerHandler
+        {
+            void OnStart();
+            void OnPacket(Remote r);
+            void OnTick();
+            void OnAbort();
+        }
+
+        private Conn _Connection;
+        private Thread _NetworkThread;
+        private object _Mutex = new object();
+        private volatile bool _ThreadRunning;
+        private volatile int _Interval = 1;
+        private volatile IServerHandler _Handler;
+
+        private List<ClientInfo> _Clients = new List<ClientInfo>();
+
+        private NetworkServerInputHandler _InputHandler;
+
+        public Server(int port)
+        {
+            _Connection = new Conn(1024);
+            _Connection.Bind(port);
+
+            _Handler = new WaitForStartHandler { _Parent = this };
+
+            _NetworkThread = new Thread(ThreadStart);
+            _NetworkThread.Start();
+
+            _ThreadRunning = true;
+        }
+
+        public void Stop()
+        {
+            lock (_Mutex)
+            {
+                if (_NetworkThread == null)
+                {
+                    return;
+                }
+                _ThreadRunning = false;
+                _NetworkThread = null;
+            }
+        }
+
+        public void StartGame()
+        {
+            _Handler = new GameStartHandler { Parent = this };
+            ConnectionSelectForm.Log("Game start");
+            ConnectionSelectForm.CloseWindow();
+        }
+
+        private void ThreadStart()
+        {
+            IServerHandler h = null;
+            while (_ThreadRunning)
+            {
+                if (h != _Handler)
+                {
+                    h = _Handler;
+                    h.OnStart();
+                }
+
+                Remote r;
+                while (_Connection.Receive(out r))
+                {
+                    if (_Connection.Buffer.CheckSum())
+                    {
+                        h.OnPacket(r);
+                    }
+                }
+                h.OnTick();
+                Thread.Sleep(_Interval);
+            }
+            h.OnAbort();
+        }
+
+        private void RemoveClient(Remote r)
+        {
+            if (r.Data == null)
+            {
+                return;
+            }
+            _Clients.Remove((ClientInfo)r.Data);
+            r.ReceiveCount = 0;
+        }
+
+        private class WaitForStartHandler : IServerHandler
+        {
+            public Server _Parent;
+            private int _CountForUpdateRemote;
+
+            public void OnStart()
+            {
+                _Parent._Interval = 50;
+            }
+
+            public void OnPacket(Remote r)
+            {
+                var type = (PacketType)_Parent._Connection.Buffer.ReadByte();
+                switch (type)
+                {
+                    case PacketType.NewConnection:
+                        if (r.ReceiveCount == 1)
+                        {
+                            ClientInfo ci = new ClientInfo();
+                            ci.Remote = r;
+                            r.Data = ci;
+                            _Parent._Clients.Add(ci);
+
+                            //just reply
+                            SendStatus(r);
+
+                            ConnectionSelectForm.Log("New client");
+                            return;
+                        }
+                        break;
+                    case PacketType.ClientStatus:
+                        if (r.ReceiveCount != 1)
+                        {
+                            //TODO check if active client
+                            //we don't need any information, just reply
+                            SendStatus(r);
+
+                            ConnectionSelectForm.Log("Client status");
+                            return;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                ConnectionSelectForm.Log("Error");
+                _Parent.RemoveClient(r);
+            }
+
+            public void OnTick()
+            {
+                //check every 1s
+                if (++_CountForUpdateRemote > 20)
+                {
+                    _CountForUpdateRemote = 0;
+
+                    //we don't ask for reply, so check reply for long time (100s)
+                    //client should send tick frequently, check if we received in the last 1s
+
+                    for (int i = 0; i < _Parent._Clients.Count; ++i)
+                    {
+                        if (!_Parent._Connection.UpdateRemoteList(_Parent._Clients[i].Remote, 1000 * 100, 1000))
+                        {
+                            _Parent._Clients.RemoveAt(i);
+                            i -= 1;
+                        }
+                    }
+                }
+                //
+            }
+
+            private void SendStatus(Remote r)
+            {
+                var buffer = _Parent._Connection.Buffer;
+                buffer.Reset(0);
+                buffer.WriteByte((byte)PacketType.ServerStatus);
+                buffer.WriteSum();
+                _Parent._Connection.Send(r);
+            }
+
+            public void OnAbort()
+            {
+            }
+        }
+
+        private class GameStartHandler : IServerHandler
+        {
+            public Server Parent;
+            private bool[] _Ready;
+
+            public void OnStart()
+            {
+                Parent._Interval = 1;
+                for (int i = 0; i < Parent._Clients.Count; ++i)
+                {
+                    Parent._Clients[i].PlayerIndex = i + 1;
+
+                    Parent._Connection.Buffer.Reset(0);
+                    Parent._Connection.Buffer.WriteByte((byte)PacketType.GameStart);
+                    Parent._Connection.Buffer.WriteSum();
+                    Parent._Connection.Send(Parent._Clients[i].Remote);
+                }
+                var client = new ClientInfo[3];
+
+                client[0] = null;
+                if (Parent._Clients.Count > 0) client[1] = Parent._Clients[0];
+                if (Parent._Clients.Count > 1) client[2] = Parent._Clients[1];
+                _Ready = client.Select(c => c == null).ToArray();
+
+                Parent._InputHandler = new NetworkServerInputHandler(client, 0);
+                InputManager.RegisterHandler(Parent._InputHandler);
+            }
+
+            private byte[] _ByteBuffer = new byte[9];
+
+            public void OnPacket(Remote r)
+            {
+                var type = (PacketType)Parent._Connection.Buffer.ReadByte();
+                switch (type)
+                {
+                    case PacketType.NewConnection:
+                        //TODO
+                        return;
+                    case PacketType.ClientReady:
+                        _Ready[RemoteIndex(r)] = true;
+                        if (_Ready.All(rr => rr))
+                        {
+                            Parent._InputHandler.AllReady();
+                        }
+                        return;
+                    case PacketType.ClientStatus:
+                        //ignore
+                        return;
+                    case PacketType.ClientInputData:
+                        //
+                        Parent._Connection.Buffer.ReadBytes(_ByteBuffer);
+                        Parent._InputHandler.ReceiveNetworkData(RemoteIndex(r), _ByteBuffer);
+                        return;
+                    default:
+                        break;
+                }
+            }
+
+            private int RemoteIndex(Remote r)
+            {
+                return ((ClientInfo)r.Data).PlayerIndex;
+            }
+
+            public void OnTick()
+            {
+                Parent._InputHandler.SendNetworkData(Parent._Connection);
+            }
+
+            public void OnAbort()
+            {
+            }
+        }
+
+    }
+}

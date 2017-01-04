@@ -10,7 +10,7 @@ namespace NetworkTest
 {
     class SocketTest
     {
-        static void Main2(string[] args)
+        static void Main(string[] args)
         {
             WinSock.WSAData wsa;
             WinSock.WSAStartup(0x22, out wsa);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -39,5 +40,12 @@ namespace PluginUtils.Injection.Input
                 _Hanlders.Add(h);
             }
         }
+
+        public static void ZeroInputData(IntPtr ptr, int len)
+        {
+            Marshal.Copy(_Zero, 0, ptr, len > 0x100 ? 0x100 : len);
+        }
+
+        private static readonly byte[] _Zero = new byte[0x100];
     }
 }

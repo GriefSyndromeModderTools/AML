@@ -31,6 +31,8 @@ namespace PluginUtils
         private static void WindowsThreadStart()
         {
             Action a;
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
             while (true)
             {
                 while (_Queue.TryDequeue(out a))

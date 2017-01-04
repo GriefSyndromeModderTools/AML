@@ -13,6 +13,9 @@ namespace PluginUtils.Injection.Input
         public void Init()
         {
             new InjectCoCreateInstance().InjectSelf();
+
+            //allow receiving input even when GetDeviceState fails (according to gso 2.02)
+            CodeModification.FillNop(0xC5FF8, 5);
         }
 
         public void Load()
@@ -118,20 +121,18 @@ namespace PluginUtils.Injection.Input
                 var p1 = env.GetParameterI(1);
                 var p2 = env.GetParameterP(2);
 
-                Marshal.Copy(_Zero, 0, p2, p1);
+                InputManager.ZeroInputData(p2, p1);
+                var ret = _Original(p0, p1, p2);
 
                 if (p0 == _InjectedInstance && InputManager.HandleAll(p2))
                 {
-                    env.SetReturnValue(0);
+                    env.SetReturnValue(ret);
                 }
                 else
                 {
-                    var ret = _Original(p0, p1, p2);
                     env.SetReturnValue(ret);
                 }
             }
-
-            private static readonly byte[] _Zero = new byte[0x100];
         }
     }
 }
