@@ -62,14 +62,11 @@ namespace AGSO.Core.Connection
             byte[] d;
             while (_Merger.TryDequeue(out d))
             {
+                conn.Buffer.Write(PacketType.ServerInputData, d);
                 foreach (var c in _Remote)
                 {
                     if (c != null)
                     {
-                        conn.Buffer.Reset(0);
-                        conn.Buffer.WriteByte((byte)PacketType.ServerInputData);
-                        conn.Buffer.WriteBytes(d);
-                        conn.Buffer.WriteSum();
                         conn.Send(c.Remote);
                     }
                 }

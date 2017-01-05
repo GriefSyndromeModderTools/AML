@@ -13,5 +13,6 @@ namespace AGSO.Core.Connection
         void OnPacket(Remote r);
         void OnTick();
         void OnAbort();
+        int Interval { get; }
     }
 }

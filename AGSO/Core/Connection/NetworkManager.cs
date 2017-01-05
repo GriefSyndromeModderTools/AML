@@ -10,24 +10,19 @@ namespace AGSO.Core.Connection
 {
     class NetworkManager
     {
-        private static volatile bool _Closed;
-
         public static void ShowForm()
         {
-            _Closed = false;
+            var mre = new ManualResetEvent(false);
             WindowsHelper.Run(delegate()
             {
                 var dialog = new ConnectionSelectForm();
                 dialog.FormClosed += delegate(object sender, System.Windows.Forms.FormClosedEventArgs e)
                 {
-                    _Closed = true;
+                    mre.Set();
                 };
                 dialog.Show();
             });
-            while (!_Closed)
-            {
-                Thread.Sleep(200);
-            }
+            mre.WaitOne();
         }
     }
 }

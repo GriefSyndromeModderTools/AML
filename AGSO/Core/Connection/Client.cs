@@ -10,83 +10,24 @@ using Conn = AGSO.Network.Connection;
 
 namespace AGSO.Core.Connection
 {
-    class Client
+    class Client : ConnectionHandler
     {
-        private interface IClientHandler
-        {
-            void OnStart();
-            void OnPacket(Remote r);
-            void OnTick();
-            void OnAbort();
-        }
-
-        private Conn _Connection;
-        private Thread _NetworkThread;
-        private object _Mutex = new object();
-        private volatile bool _ThreadRunning;
-        private volatile int _Interval = 1;
-        private volatile IClientHandler _Handler;
-
         private Remote _Server;
 
         private ClientInputHandler _InputHandler;
 
         public Client(string ip, int port)
         {
-            _Connection = new Conn(1024);
-
-            _Handler = new InitialClientHandler
+            Connect();
+            Start(new InitialClientHandler
             {
                 Parent = this,
                 Ip = ip,
                 Port = port,
-            };
-
-            _NetworkThread = new Thread(ThreadStart);
-            _NetworkThread.Start();
-
-            _ThreadRunning = true;
+            });
         }
 
-        public void Stop()
-        {
-            lock (_Mutex)
-            {
-                if (_NetworkThread == null)
-                {
-                    return;
-                }
-                _ThreadRunning = false;
-                _NetworkThread = null;
-            }
-        }
-
-        private void ThreadStart()
-        {
-            IClientHandler h = null;
-            while (_ThreadRunning)
-            {
-                if (h != _Handler)
-                {
-                    h = _Handler;
-                    h.OnStart();
-                }
-
-                Remote r;
-                while (_Connection.Receive(out r))
-                {
-                    if (_Connection.Buffer.CheckSum())
-                    {
-                        h.OnPacket(r);
-                    }
-                }
-                h.OnTick();
-                Thread.Sleep(_Interval);
-            }
-            h.OnAbort();
-        }
-
-        private class InitialClientHandler : IClientHandler
+        private class InitialClientHandler : IConnectionStage
         {
             public Client Parent;
             public string Ip;
@@ -96,30 +37,24 @@ namespace AGSO.Core.Connection
 
             public void OnStart()
             {
-                Parent._Interval = 10;
+                Parent.Connection.Buffer.Write(PacketType.None);
+                Parent._Server = Parent.Connection.Send(Ip, Port);
 
-                Parent._Connection.Buffer.Reset(0);
-                Parent._Connection.Buffer.WriteByte((byte)PacketType.None);
-                Parent._Connection.Buffer.WriteSum();
-                Parent._Server = Parent._Connection.Send(Ip, Port);
-
-                Thread.Sleep(2000);
+                Thread.Sleep(500);
             }
 
             public void OnPacket(Remote r)
             {
                 if (r == Parent._Server)
                 {
-                    var type = (PacketType)Parent._Connection.Buffer.ReadByte();
+                    var type = (PacketType)Parent.Connection.Buffer.ReadByte();
                     switch (type)
                     {
                         case PacketType.None:
                             if (!_Replied)
                             {
-                                Parent._Connection.Buffer.Reset(0);
-                                Parent._Connection.Buffer.WriteByte((byte)PacketType.NewConnection);
-                                Parent._Connection.Buffer.WriteSum();
-                                Parent._Server = Parent._Connection.Send(Ip, Port);
+                                Parent.Connection.Buffer.Write(PacketType.NewConnection);
+                                Parent.Connection.Send(Parent._Server);
 
                                 _Replied = true;
                             }
@@ -129,7 +64,7 @@ namespace AGSO.Core.Connection
                             return;
                         case PacketType.GameStart:
                             ConnectionSelectForm.Log("Game start");
-                            Parent._Handler = new GameStartHandler { Parent = Parent };
+                            Parent.ChangeStage(new GameStartHandler { Parent = Parent });
                             return;
                     }
                 }
@@ -141,12 +76,10 @@ namespace AGSO.Core.Connection
             {
                 if (!_Replied)
                 {
-                    if (++_TickCount >= 200)
+                    if (++_TickCount >= 100)
                     {
-                        Parent._Connection.Buffer.Reset(0);
-                        Parent._Connection.Buffer.WriteByte((byte)PacketType.None);
-                        Parent._Connection.Buffer.WriteSum();
-                        Parent._Connection.Send(Parent._Server);
+                        Parent.Connection.Buffer.Write(PacketType.NewConnection);
+                        Parent.Connection.Send(Parent._Server);
                     }
                 }
                 else
@@ -154,11 +87,9 @@ namespace AGSO.Core.Connection
                     if (++_TickCount >= 50)
                     {
                         _TickCount = 0;
-                        Parent._Connection.Buffer.Reset(0);
-                        Parent._Connection.Buffer.WriteByte((byte)PacketType.ClientStatus);
-                        Parent._Connection.Buffer.WriteSum();
-                        Parent._Connection.Send(Parent._Server);
-                        if (!Parent._Connection.UpdateRemoteList(Parent._Server, 1000 * 5, 1000 * 20))
+                        Parent.Connection.Buffer.Write(PacketType.ClientStatus);
+                        Parent.Connection.Send(Parent._Server);
+                        if (!Parent.Connection.UpdateRemoteList(Parent._Server, 1000 * 5, 1000 * 20))
                         {
                             ConnectionSelectForm.Log("Close");
                             Parent.Stop();
@@ -170,9 +101,14 @@ namespace AGSO.Core.Connection
             public void OnAbort()
             {
             }
+
+            public int Interval
+            {
+                get { return 10; }
+            }
         }
 
-        private class GameStartHandler : IClientHandler
+        private class GameStartHandler : IConnectionStage
         {
             public Client Parent;
             private byte[] _ByteBuffer = new byte[28];
@@ -189,13 +125,13 @@ namespace AGSO.Core.Connection
             {
                 if (r == Parent._Server)
                 {
-                    var type = (PacketType)Parent._Connection.Buffer.ReadByte();
+                    var type = (PacketType)Parent.Connection.Buffer.ReadByte();
                     switch (type)
                     {
                         case PacketType.ServerStatus:
                             return;
                         case PacketType.ServerInputData:
-                            Parent._Connection.Buffer.ReadBytes(_ByteBuffer);
+                            Parent.Connection.Buffer.ReadBytes(_ByteBuffer);
                             Parent._InputHandler.ReceiveNetworkData(_ByteBuffer);
                             return;
                     }
@@ -204,11 +140,16 @@ namespace AGSO.Core.Connection
 
             public void OnTick()
             {
-                Parent._InputHandler.SendNetworkData(Parent._Connection, Parent._Server);
+                Parent._InputHandler.SendNetworkData(Parent.Connection, Parent._Server);
             }
 
             public void OnAbort()
             {
+            }
+
+            public int Interval
+            {
+                get { return 1; }
             }
         }
 

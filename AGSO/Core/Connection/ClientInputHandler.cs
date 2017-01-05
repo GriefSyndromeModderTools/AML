@@ -47,18 +47,13 @@ namespace AGSO.Core.Connection
             if (_Ready == 1)
             {
                 _Ready = 2;
-                conn.Buffer.Reset(0);
-                conn.Buffer.WriteByte((byte)PacketType.ClientReady);
-                conn.Buffer.WriteSum();
+                conn.Buffer.Write(PacketType.ClientReady);
                 conn.Send(r);
             }
             byte[] cdata;
             while (_Recorder.TryDequeue(out cdata))
             {
-                conn.Buffer.Reset(0);
-                conn.Buffer.WriteByte((byte)PacketType.ClientInputData);
-                conn.Buffer.WriteBytes(cdata);
-                conn.Buffer.WriteSum();
+                conn.Buffer.Write(PacketType.ClientInputData, cdata);
                 conn.Send(r);
             }
         }

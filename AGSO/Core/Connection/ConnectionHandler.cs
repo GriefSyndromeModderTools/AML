@@ -23,6 +23,11 @@ namespace AGSO.Core.Connection
             _Connection = new Conn(1024);
         }
 
+        public Conn Connection
+        {
+            get { return _Connection; }
+        }
+
         public void Connect(int port)
         {
             _Connection = new Conn(1024);
@@ -52,6 +57,11 @@ namespace AGSO.Core.Connection
             }
         }
 
+        public void ChangeStage(IConnectionStage stage)
+        {
+            _Stage = stage;
+        }
+
         private void ThreadEntry()
         {
             IConnectionStage h = null;
@@ -61,6 +71,7 @@ namespace AGSO.Core.Connection
                 {
                     h = _Stage;
                     h.OnStart();
+                    _Interval = h.Interval;
                 }
 
                 Remote r;

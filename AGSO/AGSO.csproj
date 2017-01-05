@@ -60,6 +60,7 @@
     <Compile Include="Core\Connection\ClientInputHandler.cs" />
     <Compile Include="Core\Connection\IConnectionStage.cs" />
     <Compile Include="Core\Connection\NetworkManager.cs" />
+    <Compile Include="Core\Connection\PacketHelper.cs" />
     <Compile Include="Core\Connection\ServerInputHandler.cs" />
     <Compile Include="Core\Connection\PacketType.cs" />
     <Compile Include="Core\Connection\SequenceHandler.cs" />
