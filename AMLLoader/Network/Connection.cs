@@ -4,11 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using ConnectionDelegate = AGSO.Network.NamedPipeDelegateConnection;
 
-namespace AGSO.Network
+namespace AMLLoader.Network
 {
     public class Remote
     {
@@ -52,15 +50,18 @@ namespace AGSO.Network
 
         public Connection(int buffer)
         {
-            ConnectionDelegate.Init();
+            IntPtr s = WinSock.socket(WinSock.AF_INET, WinSock.SOCK_DGRAM, WinSock.IPPROTO_UDP);
+            int val = 1;
+            WinSock.ioctlsocket(s, 0x8004667e, ref val);
 
+            _Socket = s;
             _Clock = new Stopwatch();
             Buffer = new Network.Buffer(buffer);
         }
 
         public readonly Buffer Buffer;
 
-        //private IntPtr _Socket;
+        private IntPtr _Socket;
         private Dictionary<ulong, Remote> _RemoteList = new Dictionary<ulong, Remote>();
         private Stopwatch _Clock;
         private HashSet<ulong> _BlockRemote = new HashSet<ulong>();
@@ -72,7 +73,7 @@ namespace AGSO.Network
             var ip = addr.sin_addr;
             var port = addr.sin_port;
 
-            return ((ulong)ip) << 32 | port;
+            return ((ulong)ip) << 8 | port;
         }
 
         private Remote FindRemote(ref WinSock.sockaddr_in addr)
@@ -96,17 +97,17 @@ namespace AGSO.Network
 
         public void Bind(int port)
         {
-            ConnectionDelegate.Bind(port);
-        }
+            WinSock.sockaddr_in addr = new WinSock.sockaddr_in();
+            addr.sin_family = WinSock.AF_INET;
+            addr.sin_port = WinSock.htons((ushort)port);
+            addr.sin_addr = 0; //any
 
-        public void Client()
-        {
-            ConnectionDelegate.Client();
+            WinSock.bind(_Socket, ref addr, WinSock.sockaddr_in.Size);
         }
 
         public void Close()
         {
-            ConnectionDelegate.Close();
+            WinSock.closesocket(_Socket);
         }
 
         public void UpdateRemoteList(long receiveTimeout, long activeTimeout)
@@ -149,8 +150,11 @@ namespace AGSO.Network
         public Remote Receive()
         {
             WinSock.sockaddr_in recvaddr = new WinSock.sockaddr_in();
-            int len;
-            if (ConnectionDelegate.Receive(Buffer.Pointer, Buffer.Capacity, ref recvaddr, out len))
+            int addrlen = WinSock.sockaddr_in.Size;
+
+            var len = WinSock.recvfrom(_Socket, Buffer.Pointer, Buffer.Capacity, 0,
+                ref recvaddr, ref addrlen);
+            if (len >= 0)
             {
                 var ret = FindRemote(ref recvaddr);
                 if (ret == null)
@@ -162,7 +166,12 @@ namespace AGSO.Network
                 ret.ReceiveCount += 1;
                 return ret;
             }
-            return null;
+            var e = Marshal.GetLastWin32Error();
+            if (e == 10035)
+            {
+                return null;
+            }
+            throw new NetworkException(e);
         }
 
         public bool Receive(out Remote r)
@@ -174,7 +183,10 @@ namespace AGSO.Network
 
         public void Send(Remote r)
         {
-            ConnectionDelegate.Send(Buffer.Pointer, Buffer.Length, ref r.Address);
+            if (WinSock.sendto(_Socket, Buffer.Pointer, Buffer.Length, 0, ref r.Address, WinSock.sockaddr_in.Size) < 0)
+            {
+                throw new NetworkException(Marshal.GetLastWin32Error());
+            }
         }
 
         public Remote Send(string ip, int port)

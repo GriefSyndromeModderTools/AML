@@ -84,7 +84,7 @@
     <Compile Include="Misc\StartupLapFix.cs" />
     <Compile Include="Network\Buffer.cs" />
     <Compile Include="Network\Connection.cs" />
-    <Compile Include="Network\NetworkException.cs" />
+    <Compile Include="Network\ConnectionDelegate.cs" />
     <Compile Include="Network\WinSock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using NamedPipeDelegateServer = AMLLoader.Network.NamedPipeDelegateServer;
 
 namespace AMLLoader
 {
@@ -45,6 +46,8 @@ namespace AMLLoader
 
             Thread.Sleep(250);
 
+            //Start network delegate
+            NamedPipeDelegateServer.Run(pInfo.dwProcessId);
 
             //First call: LoadLibrary
             IntPtr injectedHandle;

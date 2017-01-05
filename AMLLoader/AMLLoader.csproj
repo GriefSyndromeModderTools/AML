@@ -47,6 +47,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Natives.cs" />
+    <Compile Include="Network\Buffer.cs" />
+    <Compile Include="Network\Connection.cs" />
+    <Compile Include="Network\NamedPipeDelegateServer.cs" />
+    <Compile Include="Network\WinSock.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
