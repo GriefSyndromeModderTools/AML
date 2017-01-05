@@ -23,17 +23,6 @@ namespace AGSO.Core.Connection
             _Instance = this;
         }
 
-        public static void Log(string msg)
-        {
-            if (!_Instance.IsDisposed && _Instance.Visible)
-            {
-                _Instance.Invoke((Action)delegate()
-                {
-                    _Instance.textBox3.AppendText(msg + "\n");
-                });
-            }
-        }
-
         private void button1_Click(object sender, EventArgs e)
         {
             if (_Client != null || _Server != null)
@@ -61,15 +50,31 @@ namespace AGSO.Core.Connection
             }
         }
 
+        public static void Log(string msg)
+        {
+            if (_Instance != null)
+            {
+                _Instance.Invoke((Action)delegate()
+                {
+                    _Instance.textBox3.AppendText(msg + "\n");
+                });
+            }
+        }
+
         public static void CloseWindow()
         {
-            if (!_Instance.IsDisposed && _Instance.Visible)
+            if (_Instance != null)
             {
                 _Instance.Invoke((Action)delegate()
                 {
                     _Instance.Close();
                 });
             }
+        }
+
+        private void ConnectionSelectForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            _Instance = null;
         }
     }
 }

@@ -14,7 +14,7 @@ namespace AGSO.Core.Connection
         private ConcurrentQueue<byte[]> _BufferPool = new ConcurrentQueue<byte[]>();
         private ConcurrentQueue<byte[]> _InputQueue = new ConcurrentQueue<byte[]>();
 
-        private byte[] _LastReturned;
+        protected byte[] _LastReturned;
 
         private byte[] _InterpolateLast, _InterpolateNext;
         private byte _InterpolateLength;
@@ -203,10 +203,11 @@ namespace AGSO.Core.Connection
             if (!_InputQueue.TryDequeue(out ret))
             {
                 WaitFor(time);
+                Thread.Sleep(5);
                 while (!_InputQueue.TryDequeue(out ret))
                 {
-                    Thread.Sleep(1);
-                    //TODO more WaitFor
+                    WaitFor(time);
+                    Thread.Sleep(5);
                 }
             }
             return ret;

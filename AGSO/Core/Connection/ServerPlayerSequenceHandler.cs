@@ -11,15 +11,14 @@ namespace AGSO.Core.Connection
         public ServerPlayerSequenceHandler() :
             base(10)
         {
-            for (int i = 0; i < NetworkServerInputHandler.InitEmptyCount; ++i)
-            {
-                this.ReceiveEmpty(15);
-            }
         }
+
+        public volatile bool EnableAutoFill;
+        private byte[] _AutoFillData = new byte[10];
 
         protected override bool CheckInterpolate(byte length, byte a, byte b)
         {
-            return length < 10;
+            return length < 12;
         }
 
         protected override byte Interpolate(byte length, byte t, byte a, byte b)
@@ -29,6 +28,21 @@ namespace AGSO.Core.Connection
 
         protected override void WaitFor(byte time)
         {
+            var lastData = base._LastReturned;
+            if (EnableAutoFill && time == ByteTime.Inc(lastData[0]))
+            {
+                _AutoFillData[0] = time;
+                for (int i = 1; i < 10; ++i)
+                {
+                    var dd = new ByteData(lastData[i]);
+                    if (dd.Frame < 15)
+                    {
+                        dd.Frame += 1;
+                    }
+                    _AutoFillData[i] = dd.Data;
+                }
+                Receive(_AutoFillData);
+            }
         }
 
         protected override void ResetAll(long time)

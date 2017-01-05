@@ -106,6 +106,7 @@
             this.Controls.Add(this.textBox1);
             this.Name = "ConnectionSelectForm";
             this.Text = "ConnectionSelectForm";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ConnectionSelectForm_FormClosed);
             this.ResumeLayout(false);
             this.PerformLayout();
 

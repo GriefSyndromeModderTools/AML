@@ -29,7 +29,7 @@ namespace AGSO.Core.Connection
 
         private Remote _Server;
 
-        private NetworkClientInputHandler _InputHandler;
+        private ClientInputHandler _InputHandler;
 
         public Client(string ip, int port)
         {
@@ -179,7 +179,7 @@ namespace AGSO.Core.Connection
 
             public void OnStart()
             {
-                Parent._InputHandler = new NetworkClientInputHandler();
+                Parent._InputHandler = new ClientInputHandler();
                 InputManager.RegisterHandler(Parent._InputHandler);
 
                 ConnectionSelectForm.CloseWindow();

@@ -13,38 +13,34 @@ using Conn = AGSO.Network.Connection;
 
 namespace AGSO.Core.Connection
 {
-    class NetworkServerInputHandler : IClientSequenceExceptionHandler, IInputHandler
+    class ServerInputHandler : IClientSequenceExceptionHandler, IInputHandler
     {
         public const int InitEmptyCount = 3;
 
         private Server.ClientInfo[] _Remote;
-        private int? _PlayerIndex;
+        private int _PlayerIndex;
 
-        private int _Ready;
+        private ManualResetEvent _Ready = new ManualResetEvent(false);
 
-        private readonly SequenceHandler[] _ClientData;
         private readonly ServerMerger _Merger;
 
         private readonly ClientRecorder _LocalRecorder;
         private readonly ClientSequenceHandler _LocalSequence;
 
-        public NetworkServerInputHandler(Server.ClientInfo[] r, int? playerIndex)
+        public ServerInputHandler(Server.ClientInfo[] r, int playerIndex)
         {
             KeyConfigInjector.Inject();
             _Remote = r;
             _PlayerIndex = playerIndex;
 
-            _ClientData = new SequenceHandler[3];
+            _Merger = new ServerMerger();
+            _Merger.AddInitialEmpty(InitEmptyCount);
             for (int i = 0; i < 3; ++i)
             {
-                _ClientData[i] = new ServerPlayerSequenceHandler();
-            }
-
-            _Merger = new ServerMerger(_ClientData);
-
-            for (int i = 0; i < InitEmptyCount; ++i)
-            {
-                _Merger.DoMerge();
+                if (i != playerIndex && r[i] == null)
+                {
+                    _Merger[i].EnableAutoFill = true;
+                }
             }
 
             _LocalRecorder = new ClientRecorder(InitEmptyCount);
@@ -53,12 +49,12 @@ namespace AGSO.Core.Connection
 
         public void AllReady()
         {
-            _Ready = 1;
+            _Ready.Set();
         }
 
         public void ReceiveNetworkData(int id, byte[] data)
         {
-            _ClientData[id].Receive(data);
+            _Merger[id].Receive(data);
         }
 
         public void SendNetworkData(Conn conn)
@@ -83,26 +79,11 @@ namespace AGSO.Core.Connection
 
         public bool HandleInput(IntPtr ptr)
         {
-            if (_Ready != 2)
-            {
-                while (_Ready == 0)
-                {
-                    Thread.Sleep(1);
-                }
-                _Ready = 2;
-            }
+            _Ready.WaitOne();
 
-            if (_PlayerIndex.HasValue)
+            if (_PlayerIndex != -1)
             {
-                _ClientData[_PlayerIndex.Value].Receive(_LocalRecorder.Convert(ptr));
-            }
-
-            for (int i = 0; i < 3; ++i)
-            {
-                if (i != _PlayerIndex && _Remote[i] == null)
-                {
-                    _ClientData[i].ReceiveEmpty(15);
-                }
+                _Merger[_PlayerIndex].Receive(_LocalRecorder.Convert(ptr));
             }
             _Merger.DoMerge();
 

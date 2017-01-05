@@ -49,6 +49,7 @@
     <Compile Include="Core\Connection\Client.cs" />
     <Compile Include="Core\Connection\ClientRecorder.cs" />
     <Compile Include="Core\Connection\ClientSequenceHandler.cs" />
+    <Compile Include="Core\Connection\ConnectionHandler.cs" />
     <Compile Include="Core\Connection\ConnectionSelectForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -56,9 +57,10 @@
       <DependentUpon>ConnectionSelectForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Core\Connection\IClientSequenceHandler.cs" />
-    <Compile Include="Core\Connection\NetworkClientInputHandler.cs" />
+    <Compile Include="Core\Connection\ClientInputHandler.cs" />
+    <Compile Include="Core\Connection\IConnectionStage.cs" />
     <Compile Include="Core\Connection\NetworkManager.cs" />
-    <Compile Include="Core\Connection\NetworkServerInputHandler.cs" />
+    <Compile Include="Core\Connection\ServerInputHandler.cs" />
     <Compile Include="Core\Connection\PacketType.cs" />
     <Compile Include="Core\Connection\SequenceHandler.cs" />
     <Compile Include="Core\Connection\Server.cs" />

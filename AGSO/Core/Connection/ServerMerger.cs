@@ -9,20 +9,43 @@ namespace AGSO.Core.Connection
 {
     class ServerMerger
     {
-        private SequenceHandler[] _Input;
+        private ServerPlayerSequenceHandler[] _Input;
         private ConcurrentQueue<byte[]> _Queue = new ConcurrentQueue<byte[]>();
         private ConcurrentQueue<byte[]> _Pool = new ConcurrentQueue<byte[]>();
         private byte[] _Last;
 
-        public ServerMerger(SequenceHandler[] input)
+        public ServerMerger()
         {
-            _Input = input;
+            _Input = new ServerPlayerSequenceHandler[3];
+            for (int i = 0; i < 3; ++i)
+            {
+                _Input[i] = new ServerPlayerSequenceHandler();
+            }
 
             for (int i = 0; i < 10; ++i)
             {
                 _Pool.Enqueue(new byte[28]);
             }
             _Last = new byte[28];
+        }
+
+        public ServerPlayerSequenceHandler this[int index]
+        {
+            get
+            {
+                return _Input[index];
+            }
+        }
+
+        public void AddInitialEmpty(int count)
+        {
+            for (int i = 0; i < count; ++i)
+            {
+                this[0].ReceiveEmpty(15);
+                this[1].ReceiveEmpty(15);
+                this[2].ReceiveEmpty(15);
+                this.DoMerge();
+            }
         }
 
         private byte[] GetFromPool()

@@ -36,7 +36,7 @@ namespace AGSO.Core.Connection
 
         private List<ClientInfo> _Clients = new List<ClientInfo>();
 
-        private NetworkServerInputHandler _InputHandler;
+        private ServerInputHandler _InputHandler;
 
         public Server(int port)
         {
@@ -45,10 +45,10 @@ namespace AGSO.Core.Connection
 
             _Handler = new WaitForStartHandler { _Parent = this };
 
+            _ThreadRunning = true;
+
             _NetworkThread = new Thread(ThreadStart);
             _NetworkThread.Start();
-
-            _ThreadRunning = true;
         }
 
         public void Stop()
@@ -213,9 +213,12 @@ namespace AGSO.Core.Connection
             {
                 Parent._Interval = 1;
                 ConnectionSelectForm.Log("[E] Client " + Parent._Clients.Count);
+                var client = new ClientInfo[3];
+
                 for (int i = 0; i < Parent._Clients.Count; ++i)
                 {
                     Parent._Clients[i].PlayerIndex = i + 1;
+                    client[i + 1] = Parent._Clients[i];
 
                     Parent._Connection.Buffer.Reset(0);
                     Parent._Connection.Buffer.WriteByte((byte)PacketType.GameStart);
@@ -224,16 +227,11 @@ namespace AGSO.Core.Connection
 
                     ConnectionSelectForm.Log("Inform " + Parent._Clients[i].Remote.ToString() + "...");
                 }
-                var client = new ClientInfo[3];
 
-                client[0] = null;
-                if (Parent._Clients.Count > 0) client[1] = Parent._Clients[0];
-                if (Parent._Clients.Count > 1) client[2] = Parent._Clients[1];
                 _Ready = client.Select(c => c == null).ToArray();
 
-                Parent._InputHandler = new NetworkServerInputHandler(client, 0);
+                Parent._InputHandler = new ServerInputHandler(client, 0);
                 InputManager.RegisterHandler(Parent._InputHandler);
-
             }
 
             private byte[] _ByteBuffer = new byte[10];

@@ -13,16 +13,16 @@ using Conn = AGSO.Network.Connection;
 
 namespace AGSO.Core.Connection
 {
-    class NetworkClientInputHandler : IClientSequenceExceptionHandler, IInputHandler
+    class ClientInputHandler : IClientSequenceExceptionHandler, IInputHandler
     {
         private volatile int _Ready;
         private readonly ClientRecorder _Recorder;
         private readonly ClientSequenceHandler _Sequence;
 
-        public NetworkClientInputHandler()
+        public ClientInputHandler()
         {
             KeyConfigInjector.Inject();
-            _Recorder = new ClientRecorder(NetworkServerInputHandler.InitEmptyCount);
+            _Recorder = new ClientRecorder(ServerInputHandler.InitEmptyCount);
             _Sequence = new ClientSequenceHandler(this);
         }
 
