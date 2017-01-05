@@ -38,13 +38,14 @@ namespace AGSO.Core.Connection
 
         private void RemoveClient(Remote r)
         {
+            r.ReceiveCount = 100;
+            Connection.Block(r);
             if (r.Data == null)
             {
                 return;
             }
             _Clients.Remove((ClientInfo)r.Data);
             ConnectionSelectForm.Log("[D] Client " + _Clients.Count);
-            r.ReceiveCount = 0;
         }
 
         private class WaitForStartHandler : IConnectionStage
@@ -220,7 +221,7 @@ namespace AGSO.Core.Connection
 
             public int Interval
             {
-                get { return 50; }
+                get { return 1; }
             }
         }
     }

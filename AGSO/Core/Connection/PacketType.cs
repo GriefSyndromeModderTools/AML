@@ -8,7 +8,7 @@ namespace AGSO.Core.Connection
 {
     enum PacketType
     {
-        None = 0,
+        None = 30,
         NewConnection,
         ServerStatus,
         ClientStatus,

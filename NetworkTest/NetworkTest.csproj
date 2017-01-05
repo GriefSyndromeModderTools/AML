@@ -32,7 +32,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>NetworkTest.NetworkQueueTest</StartupObject>
+    <StartupObject>NetworkTest.ConnectionTest</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

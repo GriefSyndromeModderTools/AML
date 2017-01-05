@@ -15,7 +15,7 @@ namespace AGSO.Core.Connection
 {
     class ServerInputHandler : IClientSequenceExceptionHandler, IInputHandler
     {
-        public const int InitEmptyCount = 3;
+        public const int InitEmptyCount = 6;
 
         private Server.ClientInfo[] _Remote;
         private int _PlayerIndex;

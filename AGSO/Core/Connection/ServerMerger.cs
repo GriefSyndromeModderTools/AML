@@ -70,7 +70,7 @@ namespace AGSO.Core.Connection
             var p3 = _Input[2].Next();
             Array.Copy(p1, 0, ret, 0, 10);
             Array.Copy(p2, 1, ret, 10, 9);
-            Array.Copy(p2, 1, ret, 19, 9);
+            Array.Copy(p3, 1, ret, 19, 9);
             _Queue.Enqueue(ret);
         }
 

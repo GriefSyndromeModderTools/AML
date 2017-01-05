@@ -78,7 +78,8 @@ namespace AGSO.Core.Connection
                 {
                     if (++_TickCount >= 100)
                     {
-                        Parent.Connection.Buffer.Write(PacketType.NewConnection);
+                        _TickCount = 0;
+                        Parent.Connection.Buffer.Write(PacketType.None);
                         Parent.Connection.Send(Parent._Server);
                     }
                 }
