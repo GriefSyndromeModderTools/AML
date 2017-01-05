@@ -9,12 +9,18 @@ using System.Windows.Forms;
 
 namespace PluginUtils.Injection.Squirrel
 {
+    [Plugin(Name = "SquirrelInjectorInjector", RawVersion = "1.0")]
     class SquirrelInjectorPlugin : IAMLPlugin
     {
         public static IntPtr SquirrelVM { get; private set; }
         //public static readonly Dictionary<string, SquirrelFuncDelegate> UnregisteredFunction =
         //    new Dictionary<string, SquirrelFuncDelegate>();
         public static event Action<IntPtr> OnSquirrelCreated;
+
+        public IPluginMetaData GetMetaData()
+        {
+            throw new NotImplementedException();
+        }
 
         public void Init()
         {

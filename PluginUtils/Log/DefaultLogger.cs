@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,7 +10,7 @@ namespace PluginUtils.Log
 {
     class DefaultLogger : ILogger
     {
-        private StreamWriter _Writer;
+        private readonly StreamWriter _Writer;
 
         public DefaultLogger()
         {
@@ -27,6 +28,13 @@ namespace PluginUtils.Log
         public void PluginCreated(IAMLPlugin plugin)
         {
             _Writer.WriteLine("Plugin created: {0}", plugin.GetType().FullName);
+            _Writer.Flush();
+        }
+
+        public void PluginMissDependency(Type plugin, string missedDenpendency, Version version)
+        {
+            _Writer.WriteLine(
+                $"Plugin {plugin.GetCustomAttribute<PluginAttribute>().Name} cannot be loaded: {missedDenpendency}({version}) is missing.");
             _Writer.Flush();
         }
 

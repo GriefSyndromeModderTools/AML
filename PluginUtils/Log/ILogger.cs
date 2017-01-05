@@ -12,6 +12,8 @@ namespace PluginUtils.Log
     {
         void PluginCreated(IAMLPlugin plugin);
 
+        void PluginMissDependency(Type plugin, string missedDenpendency, Version version);
+
         //note that at the time this function is called, the object is
         //only going through base class init
         void NativeInjectorCreated(NativeWrapper injector);

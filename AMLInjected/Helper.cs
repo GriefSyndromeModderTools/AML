@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace AMLInjected
 {
-    class LogHelper
+    internal static class Helper
     {
-        public static void LoadedLibrary(Assembly a)
+        public static void LoadPlugins(IEnumerable<string> dllFiles)
         {
-            PluginUtils.Log.LoggerManager.LibraryLoaded(a);
+            PluginUtils.PluginLoader.LoadPlugins(dllFiles);
         }
 
-        public static void System(string msg)
+        public static void LogSystem(string msg)
         {
             PluginUtils.Log.LoggerManager.System(msg);
         }

@@ -21,6 +21,7 @@ namespace Debugger
         void RuntimeExceptionArrived(string exceptiondesc);
     }
 
+    [Plugin(Name = "Debugger", RawVersion = "1.0", Priority = PluginLoadPriority.High)]
     public class DebuggerPlugin : IAMLPlugin
     {
         private readonly List<IMessageHandler> _messageHandlers = new List<IMessageHandler>();
@@ -75,6 +76,11 @@ namespace Debugger
         public void UnregisterAllMessageHandler()
         {
             _messageHandlers.Clear();
+        }
+
+        public IPluginMetaData GetMetaData()
+        {
+            return null;
         }
 
         public void Init()

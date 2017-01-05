@@ -1,6 +1,7 @@
 ﻿using RGiesecke.DllExport;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -24,60 +25,10 @@ namespace AMLInjected
             
             AppDomain.CurrentDomain.AppendPrivatePath("aml/core");
             AppDomain.CurrentDomain.AppendPrivatePath("aml/mods");
-
-            var utilsAssembly = Assembly.LoadFile(Path.Combine(dir, "PluginUtils.dll"));
-            var pluginBase = utilsAssembly.GetType("PluginUtils.IAMLPlugin");
-
-            foreach (var plugin in utilsAssembly.GetTypes()
-                .Where(t => pluginBase.IsAssignableFrom(t)))
-            {
-                if (!plugin.IsClass || plugin.IsAbstract)
-                {
-                    continue;
-                }
-                try
-                {
-                    var constructorInfo = plugin.GetConstructor(Type.EmptyTypes);
-                    if (constructorInfo != null)
-                        PluginLoader.LoadPlugin(constructorInfo.Invoke(new object[0]));
-                }
-                catch
-                {
-                }
-            }
-
-            foreach (var file in dllFiles)
-            {
-                var lib = Path.GetFileName(file);
-                if (lib == "AMLInjected.dll" || lib == "PluginUtils.dll")
-                {
-                    continue;
-                }
-
-                try
-                {
-                    var assembly = Assembly.LoadFile(file);
-                    var types = assembly.GetTypes();
-
-                    var plugins = types.Where(t => pluginBase.IsAssignableFrom(t));
-                    foreach (var plugin in plugins)
-                    {
-                        var constructorInfo = plugin.GetConstructor(Type.EmptyTypes);
-                        if (constructorInfo != null)
-                            PluginLoader.LoadPlugin(constructorInfo.Invoke(new object[0]));
-                    }
-
-                    LogHelper.LoadedLibrary(assembly);
-                }
-                catch (Exception e)
-                {
-                    MessageBox.Show(e.ToString());
-                }
-            }
-
-            PluginLoader.FinishLoadPlugin();
-
-            LogHelper.System("Core loaded");
+            
+            Helper.LoadPlugins(dllFiles);
+            
+            Helper.LogSystem("Core loaded");
             return 0;
         }
     }
