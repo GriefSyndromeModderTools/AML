@@ -27,6 +27,11 @@ namespace PluginUtils.Log
             _Loggers.ForEach(l => l.PluginCreated(plugin));
         }
 
+        public static void PluginMissDependency(Type plugin, string missedDenpendency, Version version)
+        {
+            _Loggers.ForEach(l => l.PluginMissDependency(plugin, missedDenpendency, version));
+        }
+
         public static void NativeInjectorCreated(NativeWrapper injector)
         {
             _Loggers.ForEach(l => l.NativeInjectorCreated(injector));
