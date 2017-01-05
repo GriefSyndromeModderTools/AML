@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PluginUtils.Injection.Input
 {
-    [Plugin]
+    [Plugin(DependentPlugin = typeof(PluginUtilsMainPlugin))]
     class InputInjectorPlugin : IAMLPlugin
     {
         public void Init()

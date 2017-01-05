@@ -284,7 +284,7 @@ namespace PluginUtils
 
         private static Dictionary<Type, PluginAttribute> _PluginAttrCache = new Dictionary<Type, PluginAttribute>();
 
-        private static PluginAttribute GetPluginAttribute(Type obj)
+        public static PluginAttribute GetPluginAttribute(Type obj)
         {
             PluginAttribute ret;
             if (!_PluginAttrCache.TryGetValue(obj, out ret))

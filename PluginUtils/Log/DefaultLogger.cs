@@ -34,7 +34,7 @@ namespace PluginUtils.Log
         public void PluginMissDependency(Type plugin, string missedDenpendency, Version version)
         {
             _Writer.WriteLine(String.Format("Plugin {0} cannot be loaded: {1}({2}) is missing.",
-                plugin.GetCustomAttribute<PluginAttribute>().Name,
+                PluginLoader.GetPluginAttribute(plugin).Name,
                 missedDenpendency,
                 version));
             _Writer.Flush();

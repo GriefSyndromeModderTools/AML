@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace FramerateCtrl
 {
+    [Plugin]
     class TimeCheckInjectorPlugin : IAMLPlugin
     {
         public void Init()

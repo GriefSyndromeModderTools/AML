@@ -25,6 +25,7 @@ namespace Results_poi
         NULL                //[ Type, Value ]
     };
 
+    [Plugin]
     public class Data : IAMLPlugin
     {
         private static ArrayList list = new ArrayList();

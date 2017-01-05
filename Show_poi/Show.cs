@@ -11,6 +11,7 @@ using System.Diagnostics;
 
 namespace Show_poi
 {
+    [Plugin]
     public class Show : IAMLPlugin
     {
         private static MessagePoi text_poi; //窗口对象
