@@ -11,11 +11,6 @@ namespace PluginUtils.Injection.File
     [Plugin(Name = "FileAPIInjector", RawVersion = "1.0")]
     class FileAPIInjectorPlugin : IAMLPlugin
     {
-        public IPluginMetaData GetMetaData()
-        {
-            throw new NotImplementedException();
-        }
-
         public void Init()
         {
             new InjectCreateFile().InjectSelf();

@@ -13,11 +13,6 @@ namespace PluginUtils.Injection.Direct3D
     {
         //private static IntPtr _Device;
 
-        public IPluginMetaData GetMetaData()
-        {
-            throw new NotImplementedException();
-        }
-
         public void Init()
         {
             new InjectDirect3DCreate9().InjectSelf();

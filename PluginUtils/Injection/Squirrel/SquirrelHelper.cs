@@ -66,7 +66,13 @@ namespace PluginUtils.Injection.Squirrel
             OT_WEAKREF = (RawType._RT_WEAKREF | SQObjectCategory.SQOBJECT_REF_COUNTED)
         }
 
-        public static IntPtr SquirrelVM => SquirrelInjectorPlugin.SquirrelVM;
+        public static IntPtr SquirrelVM
+        {
+            get
+            {
+                return SquirrelInjectorPlugin.SquirrelVM;
+            }
+        }
 
         //prevent GC collecting
         private static List<SquirrelFuncDelegate> _DelegateRef = new List<SquirrelFuncDelegate>();

@@ -37,7 +37,7 @@ namespace PluginUtils.Injection.Squirrel
                     case SquirrelHelper.SQObjectType.OT_BOOL:
                         return Value.Integer == 0 ? "false" : "true";
                     case SquirrelHelper.SQObjectType.OT_STRING:
-                        return $"\"{Marshal.PtrToStringAnsi(Value.Pointer + 28)}\"";
+                        return String.Format("\"{0}\"", Marshal.PtrToStringAnsi(Value.Pointer + 28));
                     case SquirrelHelper.SQObjectType.OT_TABLE:
                     case SquirrelHelper.SQObjectType.OT_ARRAY:
                     case SquirrelHelper.SQObjectType.OT_USERDATA:
@@ -77,7 +77,13 @@ namespace PluginUtils.Injection.Squirrel
             public string Source;
             public int Line;
 
-            public string View => $"{FuncName}({Source}:{Line})";
+            public string View
+            {
+                get
+                {
+                    return String.Format("{0}({1}:{2})", FuncName, Source, Line);
+                }
+            }
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]

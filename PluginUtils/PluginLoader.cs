@@ -20,7 +20,7 @@ namespace PluginUtils
             {
                 if (plugin == null)
                 {
-                    throw new ArgumentNullException(nameof(plugin));
+                    throw new ArgumentNullException("plugin");
                 }
 
                 _preventedPlugins.Add(plugin);
@@ -30,7 +30,7 @@ namespace PluginUtils
             {
                 if (plugin == null)
                 {
-                    throw new ArgumentNullException(nameof(plugin));
+                    throw new ArgumentNullException("plugin");
                 }
 
                 _requestedPlugins.Add(plugin, version);
@@ -51,7 +51,7 @@ namespace PluginUtils
             {
                 if (plugin == null)
                 {
-                    throw new ArgumentNullException(nameof(plugin));
+                    throw new ArgumentNullException("plugin");
                 }
 
                 _preventedPlugins.Remove(plugin);
@@ -61,7 +61,7 @@ namespace PluginUtils
             {
                 if (plugin == null)
                 {
-                    throw new ArgumentNullException(nameof(plugin));
+                    throw new ArgumentNullException("plugin");
                 }
 
                 _requestedPlugins.Remove(plugin);
@@ -132,29 +132,35 @@ namespace PluginUtils
             var currentReadyToLoadPlugins = readyToLoadPlugins;
 
             var readyToLoadPluginsInfo =
-                    currentReadyToLoadPlugins.ToDictionary(p => p.GetCustomAttribute<PluginAttribute>().Name,
-                        p => p.GetCustomAttribute<PluginAttribute>().Version);
+                    currentReadyToLoadPlugins.ToDictionary(p => GetPluginAttribute(p).Name,
+                        p => GetPluginAttribute(p).Version);
 
             while (true)
             {
                 var loadPluginInfo =
                     new HashSet<string>(
                         loadPluginTmpDic.Values.Select(
-                                pl => pl.Select(p => p.GetCustomAttribute<PluginAttribute>().Name))
+                                pl => pl.Select(p => GetPluginAttribute(p).Name))
                             .Aggregate(Enumerable.Empty<string>(), (c, cc) => c.Concat(cc)));
 
                 var nextReadyToLoadPlugins = new HashSet<Type>();
                 foreach (var plugin in currentReadyToLoadPlugins)
                 {
-                    var attr = plugin.GetCustomAttribute<PluginAttribute>();
+                    var attr = GetPluginAttribute(plugin);
                     var dependencies = attr.Dependencies;
                     if (firstTest)
                     {
                         var missingDependencies = new HashSet<KeyValuePair<string, Version>>();
-                        foreach (
-                            var dep in
-                            dependencies?.Concat(attr.WeakDependencies) ??
-                            attr.WeakDependencies ?? Enumerable.Empty<KeyValuePair<string, Version>>())
+
+                        foreach (var dep in dependencies)
+                        {
+                            Version ver;
+                            if (!readyToLoadPluginsInfo.TryGetValue(dep.Key, out ver) || ver < dep.Value)
+                            {
+                                missingDependencies.Add(dep);
+                            }
+                        }
+                        foreach (var dep in attr.WeakDependencies)
                         {
                             Version ver;
                             if (!readyToLoadPluginsInfo.TryGetValue(dep.Key, out ver) || ver < dep.Value)
@@ -174,11 +180,9 @@ namespace PluginUtils
                         firstTest = false;
                     }
                     
-                    if (dependencies == null || !dependencies.Select(pair => pair.Key)
-                        .Except(loadPluginInfo)
-                        .Any())
+                    if (!dependencies.Select(pair => pair.Key).Except(loadPluginInfo).Any())
                     {
-                        var priority = plugin.GetCustomAttribute<PluginAttribute>().Priority;
+                        var priority = GetPluginAttribute(plugin).Priority;
                         List<Type> loadList;
                         if (loadPluginTmpDic.TryGetValue(priority, out loadList))
                         {
@@ -205,8 +209,9 @@ namespace PluginUtils
 
             if (currentReadyToLoadPlugins.Count > 0)
             {
-                Log.LoggerManager.System(
-                    $"Warning: Cycle dependency detected, these plugins will not be loaded:{currentReadyToLoadPlugins.Aggregate("", (str, plugin) => string.Concat(str, "\n", plugin.GetCustomAttribute<PluginAttribute>().Name))}");
+                Log.LoggerManager.System(String.Format(
+                    "Warning: Cycle dependency detected, these plugins will not be loaded:{0}",
+                    currentReadyToLoadPlugins.Aggregate("", (str, plugin) => String.Concat(str, "\n", GetPluginAttribute(plugin).Name))));
             }
 
             var keys = loadPluginTmpDic.Keys.ToList();
@@ -225,7 +230,8 @@ namespace PluginUtils
                 }
                 catch (Exception e)
                 {
-                    Log.LoggerManager.System($"Unhandled Exception caught while loading plugin {pluginType.GetCustomAttribute<PluginAttribute>().Name}: {e.Message}");
+                    Log.LoggerManager.System(String.Format("Unhandled Exception caught while loading plugin {0}: {1}",
+                        GetPluginAttribute(pluginType).Name, e.Message));
                 }
             }
 
@@ -234,7 +240,7 @@ namespace PluginUtils
 
         public static void LoadPlugin(Type pluginType)
         {
-            if (_corePermissionToken.CheckPreventedPlugin(pluginType.GetCustomAttribute<PluginAttribute>().Name))
+            if (_corePermissionToken.CheckPreventedPlugin(GetPluginAttribute(pluginType).Name))
             {
                 return;
             }
@@ -248,7 +254,10 @@ namespace PluginUtils
 
         public static void LoadPlugin(IAMLPlugin plugin)
         {
-            (plugin as IAMLCorePlugin)?.GrantCorePermission(_corePermissionToken);
+            if (plugin is IAMLCorePlugin)
+            {
+                ((IAMLCorePlugin)plugin).GrantCorePermission(_corePermissionToken);
+            }
 
             _Plugins.Add(plugin);
             Log.LoggerManager.PluginCreated(plugin);
@@ -257,7 +266,7 @@ namespace PluginUtils
         public static void FinishLoadPlugin()
         {
             var loadedPluginAttributes =
-                _Plugins.Select(p => p.GetType().GetCustomAttribute<PluginAttribute>())
+                _Plugins.Select(p => GetPluginAttribute(p.GetType()))
                     .ToDictionary(attr => attr.Name, attr => attr.Version);
             foreach (var requestedPlugin in _corePermissionToken.GetRequestedPlugins())
             {
@@ -271,6 +280,45 @@ namespace PluginUtils
             var m = new PluginManager();
             Plugins.Manager = m;
             m.Run();
+        }
+
+        private static Dictionary<Type, PluginAttribute> _PluginAttrCache = new Dictionary<Type, PluginAttribute>();
+
+        private static PluginAttribute GetPluginAttribute(Type obj)
+        {
+            PluginAttribute ret;
+            if (!_PluginAttrCache.TryGetValue(obj, out ret))
+            {
+                var raw = obj.GetCustomAttribute<PluginAttribute>();
+                ret = new PluginAttribute();
+
+                ret.Dependencies = raw.Dependencies;
+                if (ret.Dependencies == null)
+                {
+                    ret.Dependencies = new Dictionary<string, Version>();
+                }
+
+                ret.DependentPlugin = raw.DependentPlugin;
+
+                ret.Name = raw.Name;
+                if (ret.Name == null)
+                {
+                    ret.Name = obj.Name;
+                }
+
+                ret.Priority = raw.Priority;
+
+                ret.RawVersion = raw.RawVersion;
+
+                ret.WeakDependencies = raw.WeakDependencies;
+                if (ret.WeakDependencies == null)
+                {
+                    ret.WeakDependencies = new Dictionary<string, Version>();
+                }
+
+                _PluginAttrCache.Add(obj, ret);
+            }
+            return ret;
         }
 
         private class PluginManager : IAMLPluginManager
@@ -290,7 +338,7 @@ namespace PluginUtils
                     return (T) p;
                 }
 
-                throw new KeyNotFoundException($"Plugin {typeof(T).Name} does not loaded.");
+                throw new KeyNotFoundException(String.Format("Plugin {} does not loaded.", typeof(T).Name));
             }
 
             public void Run()

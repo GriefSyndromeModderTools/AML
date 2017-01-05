@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AGSOMainPlugin.cs" />
     <Compile Include="Core\Common\InputHandler.cs" />
     <Compile Include="Core\FP\FPCode.cs" />
     <Compile Include="Core\GSO\GSOHelper.cs" />

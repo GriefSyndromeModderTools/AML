@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace AGSO.Core.Input
 {
+    [Plugin(DependentPlugin = typeof(AGSOMainPlugin))]
     class InputInjectorPlugin : IAMLPlugin
     {
         public void Init()

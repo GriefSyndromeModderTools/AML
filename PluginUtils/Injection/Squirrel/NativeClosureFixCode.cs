@@ -12,11 +12,6 @@ namespace PluginUtils.Injection.Squirrel
     [Plugin(Name = "NativeClosureFixCode", RawVersion = "1.0")]
     class NativeClosureFixCode : IAMLPlugin
     {
-        public IPluginMetaData GetMetaData()
-        {
-            throw new NotImplementedException();
-        }
-
         public void Init()
         {
             {

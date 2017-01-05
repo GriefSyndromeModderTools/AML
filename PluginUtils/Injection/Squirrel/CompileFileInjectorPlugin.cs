@@ -18,11 +18,6 @@ namespace PluginUtils.Injection.Squirrel
         }
         private static Stack<CompileFileCall> _CallStack = new Stack<CompileFileCall>();
 
-        public IPluginMetaData GetMetaData()
-        {
-            throw new NotImplementedException();
-        }
-
         public void Init()
         {
             new InjectBeforeArgs().InjectSelf();

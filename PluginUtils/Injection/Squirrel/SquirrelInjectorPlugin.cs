@@ -17,11 +17,6 @@ namespace PluginUtils.Injection.Squirrel
         //    new Dictionary<string, SquirrelFuncDelegate>();
         public static event Action<IntPtr> OnSquirrelCreated;
 
-        public IPluginMetaData GetMetaData()
-        {
-            throw new NotImplementedException();
-        }
-
         public void Init()
         {
             new InjectSquirrelVM().InjectSelf();
