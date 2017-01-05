@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Connection\ByteData.cs" />
+    <Compile Include="Core\Connection\ByteTime.cs" />
     <Compile Include="Core\Connection\Client.cs" />
     <Compile Include="Core\Connection\ClientRecorder.cs" />
     <Compile Include="Core\Connection\ClientSequenceHandler.cs" />
@@ -54,6 +55,7 @@
     <Compile Include="Core\Connection\ConnectionSelectForm.Designer.cs">
       <DependentUpon>ConnectionSelectForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Core\Connection\IClientSequenceHandler.cs" />
     <Compile Include="Core\Connection\NetworkClientInputHandler.cs" />
     <Compile Include="Core\Connection\NetworkManager.cs" />
     <Compile Include="Core\Connection\NetworkServerInputHandler.cs" />
@@ -61,6 +63,7 @@
     <Compile Include="Core\Connection\SequenceHandler.cs" />
     <Compile Include="Core\Connection\Server.cs" />
     <Compile Include="Core\Connection\ServerMerger.cs" />
+    <Compile Include="Core\Connection\ServerPlayerSequenceHandler.cs" />
     <Compile Include="Core\GSO\GSOHelper.cs" />
     <Compile Include="Core\GSO\NetworkListener.cs" />
     <Compile Include="Core\GSO\NetworkListenerForm.cs">

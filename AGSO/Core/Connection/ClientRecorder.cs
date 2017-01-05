@@ -76,7 +76,7 @@ namespace AGSO.Core.Connection
         private byte[] GetClientData(IntPtr ptr)
         {
             var data = GetFromPool();
-            data[0] = Inc(_Last[0]);
+            data[0] = ByteTime.Inc(_Last[0]);
 
             for (int i = 0; i < 9; ++i)
             {
@@ -102,20 +102,6 @@ namespace AGSO.Core.Connection
             _Pool.Enqueue(_Last);
             _Last = data;
             return data;
-        }
-
-        private byte Inc(byte b)
-        {
-            return (byte)((b + 1) & 255);
-        }
-
-        private int Diff(byte a, byte b)
-        {
-            if (a <= b)
-            {
-                return b - a;
-            }
-            return b + 256 - a;
         }
     }
 }

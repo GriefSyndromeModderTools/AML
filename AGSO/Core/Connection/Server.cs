@@ -157,7 +157,6 @@ namespace AGSO.Core.Connection
                             SendStatus(r);
 
                             ConnectionSelectForm.Log("Client status " + r.ToString());
-                            ConnectionSelectForm.Log("[B] Client " + _Parent._Clients.Count);
                             return;
                         }
                         break;
