@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace PluginUtils.Injection.Direct3D
 {
+    [Plugin(Name = "Direct3DInjector", RawVersion = "1.0")]
     class Direct3DInjectorPlugin : IAMLPlugin
     {
         //private static IntPtr _Device;

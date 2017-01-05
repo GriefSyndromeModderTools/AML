@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace AGSO.Core.GSO
 {
+    [Plugin(DependentPlugin = typeof(AGSOMainPlugin))]
     class NetworkListener : IAMLPlugin
     {
         private static NetworkListenerForm _Form;

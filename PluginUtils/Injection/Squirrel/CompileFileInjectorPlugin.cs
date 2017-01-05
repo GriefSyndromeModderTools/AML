@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace PluginUtils.Injection.Squirrel
 {
+    [Plugin(Name = "CompileFileInjector", RawVersion = "1.0")]
     class CompileFileInjectorPlugin : IAMLPlugin
     {
         private struct CompileFileCall

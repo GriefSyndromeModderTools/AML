@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace PluginUtils.Injection.File
 {
+    [Plugin(Name = "FileAPIInjector", RawVersion = "1.0")]
     class FileAPIInjectorPlugin : IAMLPlugin
     {
         public void Init()

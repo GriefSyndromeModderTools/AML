@@ -9,6 +9,7 @@ using System.Windows.Forms;
 
 namespace PluginUtils.Injection.Squirrel
 {
+    [Plugin(Name = "SquirrelInjectorInjector", RawVersion = "1.0")]
     class SquirrelInjectorPlugin : IAMLPlugin
     {
         public static IntPtr SquirrelVM { get; private set; }

@@ -32,7 +32,7 @@ namespace PluginUtils.Injection.Squirrel
             Dictionary<string, int> script;
             if (_FunctionDict.TryGetValue(file, out script))
             {
-                SquirrelFunctions.pushobject_(vm, table.Type, table.Pointer);
+                SquirrelFunctions.pushobject_(vm, table.Type, table.Value);
                 ProcessTable(vm, script);
                 SquirrelFunctions.pop(vm, 1);
             }
@@ -132,7 +132,7 @@ namespace PluginUtils.Injection.Squirrel
             SquirrelFunctions.pop(vm, 2);
 
             var f = _FunctionList[index];
-            return f.Invoke(vm, SquirrelFunctions.gettop(vm), obj.Type, obj.Pointer);
+            return f.Invoke(vm, SquirrelFunctions.gettop(vm), obj.Type, obj.Value);
         }
     }
 }

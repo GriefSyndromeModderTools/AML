@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace AGSO.Misc
 {
+    [Plugin(DependentPlugin = typeof(AGSOMainPlugin))]
     class GameWindowTitleFix : IAMLPlugin
     {
         public static int Handle { get; private set; }

@@ -67,6 +67,7 @@
     <Compile Include="Core\Connection\Server.cs" />
     <Compile Include="Core\Connection\ServerMerger.cs" />
     <Compile Include="Core\Connection\ServerPlayerSequenceHandler.cs" />
+    <Compile Include="AGSOMainPlugin.cs" />
     <Compile Include="Core\GSO\GSOHelper.cs" />
     <Compile Include="Core\GSO\NetworkListener.cs" />
     <Compile Include="Core\GSO\NetworkListenerForm.cs">

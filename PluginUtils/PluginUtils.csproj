@@ -43,6 +43,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attrtibutes.cs" />
+    <Compile Include="Exceptions.cs" />
+    <Compile Include="IAMLCorePlugin.cs" />
     <Compile Include="IAMLPlugin.cs" />
     <Compile Include="IAMLPluginManager.cs" />
     <Compile Include="Injection\Direct3D\Direct3DHelper.cs" />

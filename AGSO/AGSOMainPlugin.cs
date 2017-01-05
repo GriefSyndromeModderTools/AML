@@ -1,19 +1,17 @@
 ﻿using PluginUtils;
-using PluginUtils.Injection.Native;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AGSO.Misc
+namespace AGSO
 {
-    [Plugin(DependentPlugin = typeof(AGSOMainPlugin))]
-    class MultipleProcessFix : IAMLPlugin
+    [Plugin(Name = "AGSO", RawVersion = "0.1")]
+    class AGSOMainPlugin :IAMLPlugin
     {
         public void Init()
         {
-            CodeModification.Modify(0x9F633, 0xEB);
         }
 
         public void Load()

@@ -56,7 +56,10 @@ namespace AGSO.Core.Connection
             {
                 _Instance.Invoke((Action)delegate()
                 {
-                    _Instance.textBox3.AppendText(msg + "\n");
+                    if (_Instance != null)
+                    {
+                        _Instance.textBox3.AppendText(msg + "\n");
+                    }
                 });
             }
         }
@@ -67,7 +70,10 @@ namespace AGSO.Core.Connection
             {
                 _Instance.Invoke((Action)delegate()
                 {
-                    _Instance.Close();
+                    if (_Instance != null)
+                    {
+                        _Instance.Close();
+                    }
                 });
             }
         }

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace AGSO.Misc
 {
+    [Plugin(DependentPlugin = typeof(AGSOMainPlugin))]
     class StartupLapFix : IAMLPlugin
     {
         public void Init()

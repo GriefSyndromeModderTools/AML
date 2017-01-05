@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace AGSO.Core.Input
 {
+    [Plugin(DependentPlugin = typeof(AGSOMainPlugin))]
     class ReplayInputHandler : IAMLPlugin, IInputHandler
     {
         private static ushort[] _Rep;

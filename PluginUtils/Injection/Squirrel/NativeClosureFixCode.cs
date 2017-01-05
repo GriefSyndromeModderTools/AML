@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 namespace PluginUtils.Injection.Squirrel
 {
     //fix griefsyndrome can not directly run native callbacks
+    [Plugin(Name = "NativeClosureFixCode", RawVersion = "1.0")]
     class NativeClosureFixCode : IAMLPlugin
     {
         public void Init()
