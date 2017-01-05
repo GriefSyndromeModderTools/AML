@@ -8,14 +8,9 @@ using System.Threading.Tasks;
 
 namespace PluginUtils.Injection.File
 {
-    [Plugin(Name = "FileAPIInjector", RawVersion = "1.0")]
+    [Plugin(DependentPlugin = typeof(PluginUtilsMainPlugin))]
     class FileAPIInjectorPlugin : IAMLPlugin
     {
-        public IPluginMetaData GetMetaData()
-        {
-            throw new NotImplementedException();
-        }
-
         public void Init()
         {
             new InjectCreateFile().InjectSelf();

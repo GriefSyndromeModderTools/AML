@@ -9,14 +9,9 @@ using System.Threading.Tasks;
 namespace PluginUtils.Injection.Squirrel
 {
     //fix griefsyndrome can not directly run native callbacks
-    [Plugin(Name = "NativeClosureFixCode", RawVersion = "1.0")]
+    [Plugin(DependentPlugin = typeof(PluginUtilsMainPlugin))]
     class NativeClosureFixCode : IAMLPlugin
     {
-        public IPluginMetaData GetMetaData()
-        {
-            throw new NotImplementedException();
-        }
-
         public void Init()
         {
             {

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace AGSO.Core.GSO
 {
+    [Plugin(DependentPlugin = typeof(AGSOMainPlugin))]
     class GSOHelper : IAMLPlugin
     {
         public static bool IsGSO { get; private set; }
@@ -49,6 +50,5 @@ namespace AGSO.Core.GSO
                 }
             }
         }
-
     }
 }

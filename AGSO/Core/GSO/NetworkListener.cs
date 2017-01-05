@@ -1,5 +1,4 @@
-﻿using AGSO.Core.Common;
-using PluginUtils;
+﻿using PluginUtils;
 using PluginUtils.Injection.Native;
 using System;
 using System.Collections.Generic;
@@ -11,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace AGSO.Core.GSO
 {
+    [Plugin(DependentPlugin = typeof(AGSOMainPlugin))]
     class NetworkListener : IAMLPlugin
     {
         private static NetworkListenerForm _Form;

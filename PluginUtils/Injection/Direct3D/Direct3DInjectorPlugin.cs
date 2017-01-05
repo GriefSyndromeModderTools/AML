@@ -8,15 +8,10 @@ using System.Threading.Tasks;
 
 namespace PluginUtils.Injection.Direct3D
 {
-    [Plugin(Name = "Direct3DInjector", RawVersion = "1.0")]
+    [Plugin(DependentPlugin = typeof(PluginUtilsMainPlugin))]
     class Direct3DInjectorPlugin : IAMLPlugin
     {
         //private static IntPtr _Device;
-
-        public IPluginMetaData GetMetaData()
-        {
-            throw new NotImplementedException();
-        }
 
         public void Init()
         {

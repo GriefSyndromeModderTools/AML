@@ -1,33 +1,41 @@
 ﻿using PluginUtils;
+using PluginUtils.Injection.File;
+using PluginUtils.Injection.Input;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AGSO.Core.Common
+namespace AGSO.Core.Input
 {
-    class InputHandler
+    [Plugin(DependentPlugin = typeof(AGSOMainPlugin))]
+    class ReplayInputHandler : IAMLPlugin, IInputHandler
     {
         private static ushort[] _Rep;
-        private static int _RepOffset = 3 * 0;
-        private static bool _FPRunFlag = false;
+        private static int _RepOffset;
 
-        public static bool ReplayLoaded { get { return _Rep != null; } }
+        private static readonly ushort[] _Mask = new ushort[] {
+            0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x100
+        };
 
-        public static void InitInputHandler()
+        public void Init()
         {
             WindowsHelper.RunAndWait(delegate()
             {
-                WindowsHelper.MessageBox("before dialog");
                 try
                 {
                     var dialog = new System.Windows.Forms.OpenFileDialog();
                     if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.Cancel)
                     {
-                        AGSO.Misc.GSO2ReplayFile rep = new Misc.GSO2ReplayFile(dialog.FileName);
+                        var rep = new Misc.GSO2ReplayFile(dialog.FileName);
                         _Rep = rep.InputData;
+
+                        KeyConfigInjector.Inject();
+
+                        InputManager.RegisterHandler(this);
                     }
                 }
                 catch
@@ -37,28 +45,20 @@ namespace AGSO.Core.Common
             });
         }
 
-        public static int[] KeyConfig = new int[9 * 3];
-
-        private static readonly ushort[] _Mask = new ushort[] {
-            0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x100
-        };
-
-        public static void Aquire(IntPtr data)
+        public void Load()
         {
-            if (!_FPRunFlag)
-            {
-                _FPRunFlag = true;
-                AGSO.Core.FP.FPCode.Run();
-            }
+        }
+
+        public bool HandleInput(IntPtr ptr)
+        {
             if (_Rep == null)
             {
-                return;
+                return false;
             }
             if (_RepOffset + 2 >= _Rep.Length)
             {
                 _Rep = null;
-                System.Windows.Forms.MessageBox.Show("Replay ends.");
-                return;
+                return false;
             }
             for (int p = 0; p < 3; p++)
             {
@@ -66,19 +66,20 @@ namespace AGSO.Core.Common
                 var pp = p;
                 for (int k = 0; k < 9; ++k)
                 {
-                    var dik = KeyConfig[pp * 9 + k];
+                    var dik = KeyConfigInjector.GetInjectedKeyIndex(pp * 9 + k);
                     if ((_Rep[playerOffset] & _Mask[k]) != 0)
                     {
-                        Marshal.WriteByte(data, dik, 0x80);
+                        Marshal.WriteByte(ptr, dik, 0x80);
                     }
                     else
                     {
-                        //Marshal.WriteByte(data, dik, 0x00);
+                        Marshal.WriteByte(ptr, dik, 0x0);
                     }
                 }
             }
 
             _RepOffset += 3;
+            return true;
         }
     }
 }

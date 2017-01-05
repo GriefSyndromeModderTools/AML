@@ -23,7 +23,7 @@ namespace PluginUtils
 
     public class PluginException : AMLException
     {
-        public Type ConcernedPlugin { get; }
+        public Type ConcernedPlugin { get; private set; }
 
         public PluginException()
         {

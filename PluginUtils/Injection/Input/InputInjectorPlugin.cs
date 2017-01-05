@@ -1,49 +1,26 @@
-﻿using AGSO.Core.Common;
-using PluginUtils;
-using PluginUtils.Injection.File;
-using PluginUtils.Injection.Native;
+﻿using PluginUtils.Injection.Native;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AGSO.Core.Input
+namespace PluginUtils.Injection.Input
 {
+    [Plugin(DependentPlugin = typeof(PluginUtilsMainPlugin))]
     class InputInjectorPlugin : IAMLPlugin
     {
         public void Init()
         {
-            WindowsHelper.MessageBox("input");
             new InjectCoCreateInstance().InjectSelf();
-            InputHandler.InitInputHandler();
-            if (InputHandler.ReplayLoaded)
-            {
-                InputHandler.KeyConfig = GetKeyCodeList();
-                FileReplacement.RegisterFile(Path.GetFullPath("keyconfig.dat"), new KeyConfigFile());
-            }
-            else
-            {
-                var keyconfigData = File.ReadAllBytes(PathHelper.GetPath("keyconfig.dat"));
-                InputHandler.KeyConfig = new int[9 * 3];
-                Buffer.BlockCopy(keyconfigData, 0, InputHandler.KeyConfig, 0, 9 * 3 * 4);
-            }
+
+            //allow receiving input even when GetDeviceState fails (according to gso 2.02)
+            CodeModification.FillNop(0xC5FF8, 5);
         }
 
         public void Load()
         {
-        }
-
-        private static int[] GetKeyCodeList()
-        {
-            var ret = new int[9 * 3];
-            for (int i = 0; i < ret.Length; ++i)
-            {
-                ret[i] = i + 30;
-            }
-            return ret;
         }
 
         private class InjectCoCreateInstance : NativeWrapper
@@ -145,31 +122,18 @@ namespace AGSO.Core.Input
                 var p1 = env.GetParameterI(1);
                 var p2 = env.GetParameterP(2);
 
-                Marshal.Copy(_Zero, 0, p2, p1);
+                InputManager.ZeroInputData(p2, p1);
+                var ret = _Original(p0, p1, p2);
 
-                if (p0 == _InjectedInstance && InputHandler.ReplayLoaded)
+                if (p0 == _InjectedInstance && InputManager.HandleAll(p2))
                 {
-                    Common.InputHandler.Aquire(p2);
-                    env.SetReturnValue(0);
+                    env.SetReturnValue(ret);
                 }
                 else
                 {
-                    var ret = _Original(p0, p1, p2);
                     env.SetReturnValue(ret);
                 }
             }
-
-            private static readonly byte[] _Zero = new byte[0x100];
         }
-
-        private class KeyConfigFile : CachedModificationFileProxyFactory
-        {
-            public override byte[] Modify(byte[] data)
-            {
-                Buffer.BlockCopy(InputHandler.KeyConfig, 0, data, 0, 9 * 3 * 4);
-                return data;
-            }
-        }
-
     }
 }

@@ -7,18 +7,28 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AGSO.Core.FP
+namespace PluginUtils.Injection.Input
 {
-    class FPCode
+    public static class FPCtrl
     {
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int GeneratedDelegate();
 
-        public static void Run()
+        private static GeneratedDelegate _Generated;
+        private static object _Mutex = new object();
+
+        public static void Reset()
         {
-            var raw = AssemblyCodeStorage.WriteCode(Generate());
-            GeneratedDelegate f = (GeneratedDelegate)Marshal.GetDelegateForFunctionPointer(raw, typeof(GeneratedDelegate));
-            f();
+            lock (_Mutex)
+            {
+                if (_Generated == null)
+                {
+                    var raw = AssemblyCodeStorage.WriteCode(Generate());
+                    GeneratedDelegate f = (GeneratedDelegate)Marshal.GetDelegateForFunctionPointer(raw, typeof(GeneratedDelegate));
+                    _Generated = f;
+                }
+            }
+            _Generated();
         }
 
         private static byte[] Generate()

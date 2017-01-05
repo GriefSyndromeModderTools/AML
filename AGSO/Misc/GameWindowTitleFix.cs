@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace AGSO.Misc
 {
+    [Plugin(DependentPlugin = typeof(AGSOMainPlugin))]
     class GameWindowTitleFix : IAMLPlugin
     {
         public static int Handle { get; private set; }
@@ -31,7 +32,6 @@ namespace AGSO.Misc
             {
                 this.AddRegisterRead(Register.EAX);
                 this.AddRegisterRead(Register.EBP);
-                System.Windows.Forms.MessageBox.Show("gso");
             }
 
             public void InjectSelf()
@@ -96,6 +96,8 @@ namespace AGSO.Misc
 
             protected override void Triggered(NativeWrapper.NativeEnvironment env)
             {
+                AGSO.Core.Connection.NetworkManager.ShowForm();
+
                 var p0 = env.GetParameterI(0);
                 var p1 = env.GetParameterP(1);
                 var p2 = env.GetParameterP(2);

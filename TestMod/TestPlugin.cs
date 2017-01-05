@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace TestMod
 {
+    [Plugin]
     public class TestPlugin : IAMLPlugin
     {
         public void Init()

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace RenderOffset
 {
+    [Plugin]
     class RenderOffsetPlugin : IAMLPlugin
     {
         private static IntPtr _Device;

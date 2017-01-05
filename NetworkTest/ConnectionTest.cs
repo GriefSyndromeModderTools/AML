@@ -18,7 +18,8 @@ namespace NetworkTest
                 Connection conn = new Connection(128);
 
                 conn.Buffer.WriteByte(123);
-                conn.Send("127.0.0.1", 10800);
+                Console.WriteLine("IP:");
+                conn.Send(Console.ReadLine(), 10800);
                 conn.Close();
 
                 Console.WriteLine("Sent.");
