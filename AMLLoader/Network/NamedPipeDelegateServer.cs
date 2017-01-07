@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
@@ -19,6 +20,9 @@ namespace AMLLoader.Network
         private static ManualResetEvent _CmdReceived = new ManualResetEvent(false);
         private static ManualResetEvent _ClientBind = new ManualResetEvent(false);
 
+        private static BinaryWriter _FileSend, _FileRecv;
+        private static Stopwatch _Clock = new Stopwatch();
+
         public static void Run(int proc)
         {
             WinSock.WSAData wsa;
@@ -34,6 +38,10 @@ namespace AMLLoader.Network
 
             var th = new Thread(InitThreadEntry);
             th.Start();
+
+            _FileSend = new BinaryWriter(File.Open("loader.send." + proc + ".log", FileMode.Append));
+            _FileRecv = new BinaryWriter(File.Open("loader.recv." + proc + ".log", FileMode.Append));
+            _Clock.Start();
         }
 
         private static void InitThreadEntry()
@@ -80,6 +88,9 @@ namespace AMLLoader.Network
                     addr.sin_port = port;
                     addr.sin_addr = ip;
 
+                    _FileSend.Write((int)_Clock.ElapsedMilliseconds);
+                    _FileSend.Write(buffer, 0, 4);
+                    _FileSend.Flush();
                     lock (_Mutex)
                     {
                         if (WinSock.sendto(_Socket, buffer, length, 0, ref addr, WinSock.sockaddr_in.Size) < 0)
@@ -113,6 +124,10 @@ namespace AMLLoader.Network
                 }
                 if (len >= 0)
                 {
+                    _FileRecv.Write((int)_Clock.ElapsedMilliseconds);
+                    _FileRecv.Write(buffer, 0, 4);
+                    _FileRecv.Flush();
+
                     _Outcome.WriteByte(0x01);
                     WriteInt(_Outcome, addr.sin_addr);
                     WriteShort(_Outcome, addr.sin_port);

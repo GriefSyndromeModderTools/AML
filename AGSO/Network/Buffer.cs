@@ -119,5 +119,7 @@ namespace AGSO.Network
             }
             return Marshal.ReadByte(Pointer, --_Length) == val;
         }
+
+        private byte[] _Buffer = new byte[1024];
     }
 }

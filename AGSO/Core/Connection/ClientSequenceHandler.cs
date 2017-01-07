@@ -20,12 +20,12 @@ namespace AGSO.Core.Connection
 
         protected override bool CheckInterpolate(byte length, byte a, byte b)
         {
-            return ByteData.CheckInterpolate(length, a, b);
+            return SimpleByteData.CheckInterpolate(length, a, b);
         }
 
         protected override byte Interpolate(byte length, byte t, byte a, byte b)
         {
-            return ByteData.Interpolate(length, t, a, b);
+            return SimpleByteData.Interpolate(length, t, a, b);
         }
 
         protected override void WaitFor(byte time)
@@ -41,9 +41,10 @@ namespace AGSO.Core.Connection
         public void Next(IntPtr ptr)
         {
             var data = Next();
+            NetworkLogHelper.Write("Client next", data);
             for (int i = 0; i < 27; ++i)
             {
-                bool k = (data[i + 1] & 128) != 0;
+                bool k = SimpleByteData.Status(data[i + 1]);
                 Marshal.WriteByte(ptr, KeyConfig.GetInjectedKeyIndex(i), (byte)(k ? 0x80 : 0));
             }
         }

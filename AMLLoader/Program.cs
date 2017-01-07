@@ -19,8 +19,6 @@ namespace AMLLoader
         [STAThread]
         static void Main(string[] args)
         {
-            MessageBox.Show("Loader");
-
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 

@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AGSO.Core.Connection
@@ -13,6 +14,7 @@ namespace AGSO.Core.Connection
         private ConcurrentQueue<byte[]> _Queue = new ConcurrentQueue<byte[]>();
         private ConcurrentQueue<byte[]> _Pool = new ConcurrentQueue<byte[]>();
         private byte[] _Last;
+        private Thread _MergeThread;
 
         public ServerMerger()
         {
@@ -27,6 +29,17 @@ namespace AGSO.Core.Connection
                 _Pool.Enqueue(new byte[28]);
             }
             _Last = new byte[28];
+
+            _MergeThread = new Thread(MergeThreadEntry);
+            _MergeThread.Start();
+        }
+
+        private void MergeThreadEntry()
+        {
+            while (true)
+            {
+                this.DoMerge();
+            }
         }
 
         public ServerPlayerSequenceHandler this[int index]
@@ -41,10 +54,9 @@ namespace AGSO.Core.Connection
         {
             for (int i = 0; i < count; ++i)
             {
-                this[0].ReceiveEmpty(15);
-                this[1].ReceiveEmpty(15);
-                this[2].ReceiveEmpty(15);
-                this.DoMerge();
+                this[0].ReceiveEmpty(SimpleByteData.InitialValue);
+                this[1].ReceiveEmpty(SimpleByteData.InitialValue);
+                this[2].ReceiveEmpty(SimpleByteData.InitialValue);
             }
         }
 

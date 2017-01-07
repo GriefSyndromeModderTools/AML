@@ -22,11 +22,12 @@ namespace AGSO.Core.Connection
             {
                 _Pool.Enqueue(new byte[10]);
             }
+            var e = SimpleByteData.InitialValue;
             _Last = new byte[] {
                 (byte)(firstTime - 1),
-                15, 15, 15,
-                15, 15, 15,
-                15, 15, 15,
+                e, e, e,
+                e, e, e,
+                e, e, e,
             };
             _LastDequeue = new byte[10];
         }
@@ -81,22 +82,7 @@ namespace AGSO.Core.Connection
             for (int i = 0; i < 9; ++i)
             {
                 bool k = Marshal.ReadByte(ptr, KeyConfig.GetOriginalKeyIndex(i)) != 0;
-                var byteLast = new ByteData(_Last[i + 1]);
-                if (k == byteLast.State)
-                {
-                    if (byteLast.Frame < 15)
-                    {
-                        byteLast.Frame += 1;
-                    }
-                    data[i + 1] = byteLast.Data;
-                }
-                else
-                {
-                    byteLast.State = k;
-                    byteLast.Change = (byte)((byteLast.Change + 1) & 7);
-                    byteLast.Frame = 0;
-                    data[i + 1] = byteLast.Data;
-                }
+                data[i + 1] = SimpleByteData.Append(_Last[i + 1], k);
             }
 
             _Pool.Enqueue(_Last);

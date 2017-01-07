@@ -18,12 +18,12 @@ namespace AGSO.Core.Connection
 
         protected override bool CheckInterpolate(byte length, byte a, byte b)
         {
-            return length < 12;
+            return SimpleByteData.CheckInterpolate(length, a, b);
         }
 
         protected override byte Interpolate(byte length, byte t, byte a, byte b)
         {
-            return ByteData.Interpolate(length, t, a, b);
+            return SimpleByteData.Interpolate(length, t, a, b);
         }
 
         protected override void WaitFor(byte time)
@@ -34,12 +34,7 @@ namespace AGSO.Core.Connection
                 _AutoFillData[0] = time;
                 for (int i = 1; i < 10; ++i)
                 {
-                    var dd = new ByteData(lastData[i]);
-                    if (dd.Frame < 15)
-                    {
-                        dd.Frame += 1;
-                    }
-                    _AutoFillData[i] = dd.Data;
+                    _AutoFillData[i] = SimpleByteData.Append(lastData[i]);
                 }
                 Receive(_AutoFillData);
             }

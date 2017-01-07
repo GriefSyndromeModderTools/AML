@@ -19,6 +19,7 @@ namespace AGSO.Core.Connection
 
         private Server.ClientInfo[] _Remote;
         private int _PlayerIndex;
+        private byte _SessionID;
 
         private ManualResetEvent _Ready = new ManualResetEvent(false);
 
@@ -27,11 +28,12 @@ namespace AGSO.Core.Connection
         private readonly ClientRecorder _LocalRecorder;
         private readonly ClientSequenceHandler _LocalSequence;
 
-        public ServerInputHandler(Server.ClientInfo[] r, int playerIndex)
+        public ServerInputHandler(Server.ClientInfo[] r, int playerIndex, byte sid)
         {
             KeyConfigInjector.Inject();
             _Remote = r;
             _PlayerIndex = playerIndex;
+            _SessionID = sid;
 
             _Merger = new ServerMerger();
             _Merger.AddInitialEmpty(InitEmptyCount);
@@ -59,10 +61,14 @@ namespace AGSO.Core.Connection
 
         public void SendNetworkData(Conn conn)
         {
+            if (!_Ready.WaitOne(0))
+            {
+                return;
+            }
             byte[] d;
             while (_Merger.TryDequeue(out d))
             {
-                conn.Buffer.Write(PacketType.ServerInputData, d);
+                conn.Buffer.Write(PacketType.ServerInputData, _SessionID, d);
                 foreach (var c in _Remote)
                 {
                     if (c != null)
@@ -82,7 +88,7 @@ namespace AGSO.Core.Connection
             {
                 _Merger[_PlayerIndex].Receive(_LocalRecorder.Convert(ptr));
             }
-            _Merger.DoMerge();
+            //_Merger.DoMerge(); //moved to new thread
 
             _LocalSequence.Next(ptr);
 
