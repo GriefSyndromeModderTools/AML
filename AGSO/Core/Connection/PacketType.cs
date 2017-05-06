@@ -21,5 +21,7 @@ namespace AGSO.Core.Connection
         ClientReady,
         ServerInputData,
         ClientInputData,
+        ServerInputDataAck,
+        ClientInputDataAck,
     }
 }
