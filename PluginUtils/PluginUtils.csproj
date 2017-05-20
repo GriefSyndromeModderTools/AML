@@ -59,6 +59,7 @@
     <Compile Include="Injection\Input\IInputHandler.cs" />
     <Compile Include="Injection\Input\InputInjectorPlugin.cs" />
     <Compile Include="Injection\Input\InputManager.cs" />
+    <Compile Include="Injection\Input\KeyConfigInjector.cs" />
     <Compile Include="Injection\Native\AddressHelper.cs" />
     <Compile Include="Injection\Native\AssemblyCodeStorage.cs" />
     <Compile Include="Injection\Native\CodeModification.cs" />
