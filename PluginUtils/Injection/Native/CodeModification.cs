@@ -67,5 +67,16 @@ namespace PluginUtils.Injection.Native
             }
             Marshal.Copy(_NopArray, 0, addr, len - i);
         }
+
+        public static void WritePointer(IntPtr addr, IntPtr val)
+        {
+            Protection p = Protection.PAGE_EXECUTE_READWRITE;
+            Protection oldP;
+            VirtualProtect(addr, 4, p, out oldP);
+
+            Marshal.WriteIntPtr(addr, val);
+
+            VirtualProtect(addr, 4, oldP, out oldP);
+        }
     }
 }

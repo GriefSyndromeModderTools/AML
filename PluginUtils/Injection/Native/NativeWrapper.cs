@@ -82,7 +82,54 @@ namespace PluginUtils.Injection.Native
             _RegisterIndex[ir] = _Count++;
         }
 
+        public void InjectBefore(IntPtr addr, int len)
+        {
+            if (len < 6)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+
+            ProtectCode(addr, len, false);
+
+            IntPtr pCode;
+            IntPtr pJumpForward = AssemblyCodeStorage.AllocateIndirect();
+            IntPtr pJumpBackward = AssemblyCodeStorage.AllocateIndirect();
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                using (BinaryWriter bw = new BinaryWriter(ms))
+                {
+                    WriteCode(bw);
+
+                    byte[] moved = new byte[len];
+                    Marshal.Copy(addr, moved, 0, len);
+                    bw.Write(moved);
+
+                    bw.Write((byte)0xFF);
+                    bw.Write((byte)0x25);
+
+                    //pointer to pointer
+                    bw.Write(pJumpBackward.ToInt32());
+
+                    var assemlyCode = ms.ToArray();
+                    pCode = AssemblyCodeStorage.WriteCode(assemlyCode);
+                }
+            }
+
+            Marshal.WriteByte(addr, 0, 0xFF);
+            Marshal.WriteByte(addr, 1, 0x25);
+            var jmpForwardPtr = pJumpForward.ToInt32();
+            Marshal.WriteInt32(addr, 2, jmpForwardPtr);
+
+            //finally setup jump table
+            AssemblyCodeStorage.WriteIndirect(pJumpForward, pCode);
+            AssemblyCodeStorage.WriteIndirect(pJumpBackward, IntPtr.Add(addr, len));
+
+            ProtectCode(addr, len, true);
+        }
+
         //TODO moved should go after injected code. modify InjectGSOLoaded when fixed.
+        [Obsolete]
         public void Inject(IntPtr addr, int len)
         {
             if (len < 6)
@@ -136,6 +183,8 @@ namespace PluginUtils.Injection.Native
             ProtectCode(addr, len, true);
         }
 
+        private IntPtr _LastFDest, _LastFCode;
+
         public T InjectFunctionPointer<T>(IntPtr addrFunctionPointer, int ArgSize) where T : class
         {
             _ReturnValueIndex = _Count++;
@@ -170,11 +219,18 @@ namespace PluginUtils.Injection.Native
                 }
             }
 
-            WritePointer(addrFunctionPointer, pCode);
+            CodeModification.WritePointer(addrFunctionPointer, pCode);
+            _LastFDest = addrFunctionPointer;
+            _LastFCode = pCode;
 
             Log.LoggerManager.NativeInjectorInjectedDelegate(addrFunctionPointer, typeof(T));
 
             return ret;
+        }
+
+        public void ReinjectFunctionPointer()
+        {
+            CodeModification.WritePointer(_LastFDest, _LastFCode);
         }
 
         private NativeEnvironment GetEnvironment(IntPtr data)
@@ -189,17 +245,6 @@ namespace PluginUtils.Injection.Native
                 NativeFunctions.Protection.PAGE_EXECUTE_READWRITE;
             NativeFunctions.Protection oldP;
             NativeFunctions.VirtualProtect(addr, (uint)len, p, out oldP);
-        }
-
-        private void WritePointer(IntPtr addr, IntPtr val)
-        {
-            NativeFunctions.Protection p = NativeFunctions.Protection.PAGE_EXECUTE_READWRITE;
-            NativeFunctions.Protection oldP;
-            NativeFunctions.VirtualProtect(addr, 4, p, out oldP);
-            
-            Marshal.WriteIntPtr(addr, val);
-
-            NativeFunctions.VirtualProtect(addr, 4, oldP, out oldP);
         }
 
         protected virtual void WriteCode(BinaryWriter bw)
