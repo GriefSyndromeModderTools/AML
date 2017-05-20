@@ -18,5 +18,10 @@ namespace AMLInjected
         {
             PluginUtils.Log.LoggerManager.System(msg);
         }
+
+        public static void SetupArgs(IntPtr ptr)
+        {
+            PluginUtils.ArgHelper.Set(ptr);
+        }
     }
 }

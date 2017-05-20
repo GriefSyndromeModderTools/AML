@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="GSOReplayFile.cs" />
     <Compile Include="GSORepPlayerPlugin.cs" />
+    <Compile Include="PlayingStatus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

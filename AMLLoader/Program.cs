@@ -2,6 +2,7 @@
 using AMLLoader.NativeStructs;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -63,6 +64,29 @@ namespace AMLLoader
                 injectedHandle = (IntPtr)returnedValue;
             }
 
+            //Prepare for command-line arguments
+            IntPtr dataPtr;
+            {
+                using (var ms = new MemoryStream())
+                {
+                    using (var bw = new BinaryWriter(ms))
+                    {
+                        bw.Write((int)0);
+
+                        foreach (var arg in args)
+                        {
+                            bw.Write(arg);
+                        }
+
+                        bw.Flush();
+
+                        var data = ms.ToArray();
+                        Buffer.BlockCopy(BitConverter.GetBytes((int)data.Length), 0, data, 0, 4);
+                        dataPtr = WriteRemoteData(pInfo.hProcess, data);
+                    }
+                }
+            }
+
             //Second call: GetProcAddress
             IntPtr loader;
             {
@@ -95,7 +119,7 @@ namespace AMLLoader
             {
                 IntPtr lpThreadID;
                 var hThread = Natives.CreateRemoteThread(pInfo.hProcess, IntPtr.Zero, 0,
-                    loader, IntPtr.Zero, 0, out lpThreadID);
+                    loader, dataPtr, 0, out lpThreadID);
                 var ret = Natives.WaitForSingleObject(hThread, Natives.INFINITE);
                 uint returnedValue;
                 Natives.GetExitCodeThread(hThread, out returnedValue);

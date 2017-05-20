@@ -10,20 +10,4 @@ using System.Threading.Tasks;
 
 namespace AGSO.Misc
 {
-    [Plugin(DependentPlugin = typeof(AGSOMainPlugin))]
-    class StartupLapFix : IAMLPlugin
-    {
-        public void Init()
-        {
-            SaveDataHelper.ModifySaveData += delegate(GSDataFile.CompoundType obj)
-            {
-                obj["lastPlayLap"] = 0;
-                obj["loopNum"] = 677;
-            };
-        }
-
-        public void Load()
-        {
-        }
-    }
 }

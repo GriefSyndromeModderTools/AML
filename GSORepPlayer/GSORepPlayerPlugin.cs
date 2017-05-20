@@ -21,6 +21,12 @@ namespace GSORepPlayer
 
         public void Init()
         {
+            WindowsHelper.MessageBox(ArgHelper.Get(0));
+            InitWithDialog();
+        }
+
+        public void InitWithDialog()
+        {
             WindowsHelper.RunAndWait(delegate()
             {
                 try
