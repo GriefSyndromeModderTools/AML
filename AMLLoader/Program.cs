@@ -45,7 +45,8 @@ namespace AMLLoader
             Thread.Sleep(250);
 
             //Start network delegate
-            NamedPipeDelegateServer.Run(pInfo.dwProcessId);
+            //TODO: move this to loader plugin of AGSO
+            //NamedPipeDelegateServer.Run(pInfo.dwProcessId);
 
             //First call: LoadLibrary
             IntPtr injectedHandle;
