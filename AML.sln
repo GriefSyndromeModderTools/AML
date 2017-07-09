@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DirectxAPIRecorder", "Direc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GSORepPlayer", "GSORepPlayer\GSORepPlayer.csproj", "{7EAAB407-C965-45A7-ABBB-7268833F7DA6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyDirectXDelegate", "EmptyDirectXDelegate\EmptyDirectXDelegate.csproj", "{6B56EC9C-AD4A-41D8-85A7-3820D3355FA6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -204,6 +206,18 @@ Global
 		{7EAAB407-C965-45A7-ABBB-7268833F7DA6}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{7EAAB407-C965-45A7-ABBB-7268833F7DA6}.Release|Win32.ActiveCfg = Release|Any CPU
 		{7EAAB407-C965-45A7-ABBB-7268833F7DA6}.Release|x86.ActiveCfg = Release|Any CPU
+		{6B56EC9C-AD4A-41D8-85A7-3820D3355FA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B56EC9C-AD4A-41D8-85A7-3820D3355FA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B56EC9C-AD4A-41D8-85A7-3820D3355FA6}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{6B56EC9C-AD4A-41D8-85A7-3820D3355FA6}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{6B56EC9C-AD4A-41D8-85A7-3820D3355FA6}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{6B56EC9C-AD4A-41D8-85A7-3820D3355FA6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6B56EC9C-AD4A-41D8-85A7-3820D3355FA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B56EC9C-AD4A-41D8-85A7-3820D3355FA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B56EC9C-AD4A-41D8-85A7-3820D3355FA6}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{6B56EC9C-AD4A-41D8-85A7-3820D3355FA6}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{6B56EC9C-AD4A-41D8-85A7-3820D3355FA6}.Release|Win32.ActiveCfg = Release|Any CPU
+		{6B56EC9C-AD4A-41D8-85A7-3820D3355FA6}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

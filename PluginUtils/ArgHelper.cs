@@ -48,5 +48,15 @@ namespace PluginUtils
         {
             return _Args[index];
         }
+
+        public static string GetFollowed(string arg)
+        {
+            var index = Array.FindIndex(_Args, x => x == arg);
+            if (index == -1 || index == _Args.Length - 1)
+            {
+                return null;
+            }
+            return _Args[index + 1];
+        }
     }
 }

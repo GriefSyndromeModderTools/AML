@@ -35,9 +35,16 @@ namespace AMLLoader
             tSec.nLength = Marshal.SizeOf(tSec);
 
             var processName = "griefsyndrome.exe";
-            if (args.Contains("-o"))
             {
-                processName = "griefsyndrome_online.exe";
+                int index = Array.FindIndex(args, x => x == "/process");
+                if (index != -1 && index != args.Length - 1)
+                {
+                    processName = args[index + 1];
+                    if (!processName.EndsWith(".exe"))
+                    {
+                        processName += ".exe";
+                    }
+                }
             }
             retValue = Natives.CreateProcess(processName, null,
                 ref pSec, ref tSec, false, NORMAL_PRIORITY_CLASS | CREATE_SUSPENDED,

@@ -11,20 +11,20 @@ using System.Threading.Tasks;
 
 namespace DirectxAPIRecorder
 {
-    [Plugin(Name = "DirectxAPIRecorderPlugin", RawVersion = "0.1")]
+    [Plugin(Name = "DirectxAPIRecorder", RawVersion = "0.1")]
     public class DirectxAPIRecorderPlugin : IAMLPlugin
     {
         private class Logger
         {
-            private StreamWriter _Log = new StreamWriter("E:\\dx.log", true);
+            //private StreamWriter _Log = new StreamWriter("E:\\dx.log", true);
             
             public void WriteLine(string str, params object[] args)
             {
-                lock (_Log)
-                {
-                    _Log.WriteLine(str, args);
-                    _Log.Flush();
-                }
+                //lock (_Log)
+                //{
+                //    _Log.WriteLine(str, args);
+                //    _Log.Flush();
+                //}
             }
 
             public void Flush()
@@ -38,10 +38,10 @@ namespace DirectxAPIRecorder
 
         public void Load()
         {
+            WindowsHelper.MessageBox("record");
             Direct3DHelper.InjectDevice(InjectDevice);
             new BeforeCreateTextureInjection().InjectSelf();
             new AfterCreateTextureInjection().InjectSelf();
-            WindowsHelper.MessageBox("load");
         }
 
         private static Action _Reinject;
@@ -67,8 +67,8 @@ namespace DirectxAPIRecorder
             new CreatePixelShader().InjectSelf(device);
             //new CreateEffect().InjectSelf();
             new SetPS().InjectSelf(device);
-            new BeginStateBlockInjection().InjectSelf(device);
-            new EndStateBlockInjection().InjectSelf(device);
+            //new BeginStateBlockInjection().InjectSelf(device);
+            //new EndStateBlockInjection().InjectSelf(device);
             new DeviceSwapchainPresentInjection().InjectDevice(device);
             new SetTextureStageStateInjection().InjectSelf(device);
             //new CreateTextureInjection().InjectSelf(device);
@@ -215,6 +215,7 @@ namespace DirectxAPIRecorder
                 var p3 = env.GetParameterP(3);
                 var p4 = env.GetParameterI(4);
                 env.SetReturnValue(_Original(p0, p1, p2, p3, p4));
+                env.SetReturnValue(0);
                 _Rec.DrawUP(p3);
             }
         }

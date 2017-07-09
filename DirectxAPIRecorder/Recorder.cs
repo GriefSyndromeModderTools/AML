@@ -1,6 +1,8 @@
-﻿using System;
+﻿using PluginUtils;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -13,11 +15,57 @@ namespace DirectxAPIRecorder
         private BinaryWriter bw;
         private Dictionary<IntPtr, int> _Tex = new Dictionary<IntPtr, int>();
         private IntPtr _Screen;
+        private GZipStream _zip;
+        private FileStream _raw;
+
+        private string _NewFilename, _FileExt;
+        private int _NextId = 0;
+        private string GetNextFileName()
+        {
+            return _NewFilename + "_" + (_NextId++).ToString() + _FileExt;
+        }
+
+        private int _FrameCount = 0;
 
         public Recorder()
         {
-            bw = new BinaryWriter(File.OpenWrite(@"E:\dx.render.dat"),
-                Encoding.UTF8, false);
+            for (int i = 0; i < ArgHelper.Count; ++i)
+            {
+                if (ArgHelper.Get(i) == "/DirectxAPIRecorder:Output")
+                {
+                    var fullFileName = ArgHelper.Get(i + 1);
+                    _NewFilename = Path.ChangeExtension(fullFileName, null);
+                    _FileExt = Path.GetExtension(fullFileName);
+                    OpenFile();
+                    return;
+                }
+            }
+            bw = new BinaryWriter(new MemoryStream());
+        }
+
+        private void OpenFile()
+        {
+            var raw = File.OpenWrite(GetNextFileName());
+            var zip = new GZipStream(raw, CompressionMode.Compress, false);
+            bw = new BinaryWriter(zip, Encoding.UTF8, false);
+            //TODO
+            _zip = zip;
+            _raw = raw;
+        
+        }
+        private void Flush()
+        {
+            bw.Flush();
+            _zip.Flush();
+            _raw.Flush();
+        }
+
+        private void SwitchFile()
+        {
+            bw.Dispose();
+            _zip.Dispose();
+            _raw.Dispose();
+            OpenFile();
         }
 
         public void SetScreenTarget(IntPtr surface)
@@ -35,7 +83,9 @@ namespace DirectxAPIRecorder
         {
             bw.Write((byte)2);
             bw.Write(filename);
-            _Tex.Add(tex, _Tex.Count); //TODO duplicate texture
+            _Tex[tex] = _Tex.Count;
+            //to release server cpu pressure
+            //System.Threading.Thread.Sleep(3);
         }
 
         public void SetTexture(IntPtr tex)
@@ -56,18 +106,54 @@ namespace DirectxAPIRecorder
             bw.Write(id);
         }
 
+        Dictionary<int, int> _RS = new Dictionary<int, int>();
+        Dictionary<int, int> _RSNew = new Dictionary<int, int>();
+
+        Dictionary<int, int> _SS = new Dictionary<int, int>();
+        Dictionary<int, int> _SSNew = new Dictionary<int, int>();
+
+        private void FlushState()
+        {
+            foreach (var e in _RSNew)
+            {
+                int oldVal;
+                if (!_RS.TryGetValue(e.Key, out oldVal) || oldVal != e.Value)
+                {
+                    _RS[e.Key] = e.Value;
+                    bw.Write((byte)5);
+                    bw.Write(e.Key);
+                    bw.Write(e.Value);
+                }
+            }
+            _RSNew.Clear();
+            foreach (var e in _SSNew)
+            {
+                int oldVal;
+                if (!_SS.TryGetValue(e.Key, out oldVal) || oldVal != e.Value)
+                {
+                    _SS[e.Key] = e.Value;
+                    bw.Write((byte)6);
+                    bw.Write(e.Key);
+                    bw.Write(e.Value);
+                }
+            }
+            _SSNew.Clear();
+        }
+
         public void SetRenderState(int a, int b)
         {
-            bw.Write((byte)5);
-            bw.Write(a);
-            bw.Write(b);
+            //bw.Write((byte)5);
+            //bw.Write(a);
+            //bw.Write(b);
+            _RSNew[a] = b;
         }
 
         public void SetSamplerState(int a, int b)
         {
-            bw.Write((byte)6);
-            bw.Write(a);
-            bw.Write(b);
+            //bw.Write((byte)6);
+            //bw.Write(a);
+            //bw.Write(b);
+            _SSNew[a] = b;
         }
 
         public void SetTarget(IntPtr surface)
@@ -83,7 +169,7 @@ namespace DirectxAPIRecorder
                 {
                     id = _Tex.Count;
                     bw.Write((byte)3);
-                    _Tex.Add(surface, id);
+                    _Tex[surface] = id;
                 }
                 bw.Write((byte)7);
                 bw.Write(id);
@@ -94,6 +180,7 @@ namespace DirectxAPIRecorder
 
         public void DrawUP(IntPtr data)
         {
+            FlushState();
             Marshal.Copy(data, _DrawData, 0, _DrawData.Length);
             bw.Write((byte)8);
             bw.Write(_DrawData);
@@ -102,7 +189,12 @@ namespace DirectxAPIRecorder
         public void NewFrame()
         {
             bw.Write((byte)9);
-            bw.Flush();
+            Flush();
+
+            if (((++_FrameCount) & 65535) == 0)
+            {
+                SwitchFile();
+            }
         }
 
         public void BeginBlock()

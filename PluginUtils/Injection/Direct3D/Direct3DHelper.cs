@@ -16,6 +16,7 @@ namespace PluginUtils.Injection.Direct3D
             if (Device != IntPtr.Zero)
             {
                 func(Device);
+                _InjectActions.Add(func);
             }
             else
             {
@@ -27,7 +28,11 @@ namespace PluginUtils.Injection.Direct3D
         {
             Device = device;
             _InjectActions.ForEach(a => a(device));
-            _InjectActions.Clear();
+        }
+
+        public static void ReinjectDeviceObject(IntPtr device)
+        {
+            _InjectActions.ForEach(a => a(device));
         }
     }
 }

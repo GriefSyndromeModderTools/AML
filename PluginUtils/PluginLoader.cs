@@ -83,6 +83,15 @@ namespace PluginUtils
 
         public static void LoadPlugins(IEnumerable<string> dllFiles)
         {
+            //check for override
+            {
+                var overrideList = ArgHelper.GetFollowed("/mods");
+                if (overrideList != null)
+                {
+                    dllFiles = overrideList.Split(' ')
+                        .Select(x => Path.Combine(PathHelper.GetPath("aml/mods"), x + ".dll"));
+                }
+            }
             var readyToLoadPlugins = new HashSet<Type>();
 
             foreach (var plugin in typeof(PluginLoader).Assembly.GetTypes()
@@ -231,7 +240,7 @@ namespace PluginUtils
                 catch (Exception e)
                 {
                     Log.LoggerManager.System(String.Format("Unhandled Exception caught while loading plugin {0}: {1}",
-                        GetPluginAttribute(pluginType).Name, e.Message));
+                        GetPluginAttribute(pluginType).Name, e.ToString()));
                 }
             }
 
