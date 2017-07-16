@@ -29,6 +29,24 @@ namespace PluginUtils.Injection.Native
             Flush();
         }
 
+        public static IntPtr WrapManagedDelegate(IntPtr d)
+        {
+            IntPtr newCode = AllocateCode(6);
+            IntPtr jmp = AllocateIndirect();
+            WriteIndirect(jmp, d);
+
+            Marshal.WriteByte(newCode, 0, 0xFF);
+            Marshal.WriteByte(newCode, 1, 0x25);
+            Marshal.WriteInt32(newCode, 2, jmp.ToInt32());
+
+            return newCode;
+        }
+
+        public static IntPtr WrapManagedDelegate(Delegate d)
+        {
+            return WrapManagedDelegate(Marshal.GetFunctionPointerForDelegate(d));
+        }
+
         public static IntPtr AllocateIndirect()
         {
             if (_IndirectPointer.ToInt32() >= _IndirectEnd.ToInt32())

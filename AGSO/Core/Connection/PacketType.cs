@@ -10,6 +10,9 @@ namespace AGSO.Core.Connection
     {
         None = 30,
         NewConnection,
+        ConnectionAccept,
+        PingRequest,
+        PingReply,
         ServerStatus,
         ClientStatus,
         ServerStop,
@@ -18,5 +21,7 @@ namespace AGSO.Core.Connection
         ClientReady,
         ServerInputData,
         ClientInputData,
+        ServerInputDataAck,
+        ClientInputDataAck,
     }
 }

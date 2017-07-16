@@ -8,6 +8,8 @@ namespace AGSO.Core.Connection
 {
     struct ByteData
     {
+        public const byte InitialValue = 15;
+
         public bool State;
         public byte Change;
         public byte Frame;
@@ -91,6 +93,41 @@ namespace AGSO.Core.Connection
                 aa.Frame = (byte)(aa.Frame + t);
             }
             return aa.Data;
+        }
+
+        public static byte Append(byte l, bool v)
+        {
+            var byteLast = new ByteData(l);
+            if (v == byteLast.State)
+            {
+                if (byteLast.Frame < 15)
+                {
+                    byteLast.Frame += 1;
+                }
+                return byteLast.Data;
+            }
+            else
+            {
+                byteLast.State = v;
+                byteLast.Change = (byte)((byteLast.Change + 1) & 7);
+                byteLast.Frame = 0;
+                return byteLast.Data;
+            }
+        }
+
+        public static byte Append(byte l)
+        {
+            var byteLast = new ByteData(l);
+            if (byteLast.Frame < 15)
+            {
+                byteLast.Frame += 1;
+            }
+            return byteLast.Data;
+        }
+
+        public static bool Status(byte v)
+        {
+            return (v & 128) != 0;
         }
     }
 }

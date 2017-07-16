@@ -59,8 +59,11 @@
     <Compile Include="Core\Connection\IClientSequenceHandler.cs" />
     <Compile Include="Core\Connection\ClientInputHandler.cs" />
     <Compile Include="Core\Connection\IConnectionStage.cs" />
+    <Compile Include="Core\Connection\InputHistory.cs" />
+    <Compile Include="Core\Connection\NetworkLogHelper.cs" />
     <Compile Include="Core\Connection\NetworkManager.cs" />
     <Compile Include="Core\Connection\PacketHelper.cs" />
+    <Compile Include="Core\Connection\ResendHandler.cs" />
     <Compile Include="Core\Connection\ServerInputHandler.cs" />
     <Compile Include="Core\Connection\PacketType.cs" />
     <Compile Include="Core\Connection\SequenceHandler.cs" />
@@ -68,6 +71,7 @@
     <Compile Include="Core\Connection\ServerMerger.cs" />
     <Compile Include="Core\Connection\ServerPlayerSequenceHandler.cs" />
     <Compile Include="AGSOMainPlugin.cs" />
+    <Compile Include="Core\Connection\SimpleByteData.cs" />
     <Compile Include="Core\GSO\GSOHelper.cs" />
     <Compile Include="Core\GSO\NetworkListener.cs" />
     <Compile Include="Core\GSO\NetworkListenerForm.cs">
@@ -84,7 +88,7 @@
     <Compile Include="Misc\StartupLapFix.cs" />
     <Compile Include="Network\Buffer.cs" />
     <Compile Include="Network\Connection.cs" />
-    <Compile Include="Network\NetworkException.cs" />
+    <Compile Include="Network\ConnectionDelegate.cs" />
     <Compile Include="Network\WinSock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

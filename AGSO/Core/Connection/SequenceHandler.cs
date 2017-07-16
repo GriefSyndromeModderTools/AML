@@ -145,6 +145,8 @@ namespace AGSO.Core.Connection
                 {
                     //need interpolate
                     BeginInterpolate(ret);
+                    NetworkLogHelper.Write("Interp_1", _InterpolateLast);
+                    NetworkLogHelper.Write("Interp_2", _InterpolateNext);
                     return CalcInterpolate(time);
                 }
             }
@@ -189,6 +191,7 @@ namespace AGSO.Core.Connection
                 {
                     return data;
                 }
+                NetworkLogHelper.Write("Ignore earlier data", data);
                 _BufferPool.Enqueue(data);
             }
         }

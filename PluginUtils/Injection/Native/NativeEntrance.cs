@@ -50,12 +50,19 @@ namespace PluginUtils.Injection.Native
 
         private static void Entrance(int index, IntPtr data)
         {
-            NativeCallback cb;
-            if (!_CallbackList.TryGetValue(index, out cb))
+            try
             {
-                return;
+                NativeCallback cb;
+                if (!_CallbackList.TryGetValue(index, out cb))
+                {
+                    return;
+                }
+                cb(data);
             }
-            cb(data);
+            catch (Exception e)
+            {
+                Log.LoggerManager.System(e.ToString());
+            }
         }
     }
 }

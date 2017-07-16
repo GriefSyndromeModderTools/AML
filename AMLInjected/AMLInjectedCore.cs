@@ -18,7 +18,6 @@ namespace AMLInjected
         [DllExport("loadcore")]
         public static uint LoadCore(IntPtr ud)
         {
-            MessageBox.Show("1");
             var uri = new UriBuilder(typeof(AMLInjectedCore).Assembly.CodeBase).Path;
             var dir = Path.GetDirectoryName(Uri.UnescapeDataString(uri));
             var dllFiles = Directory.EnumerateFiles(Path.Combine(dir, "../mods"), "*.dll",
@@ -26,7 +25,8 @@ namespace AMLInjected
             
             AppDomain.CurrentDomain.AppendPrivatePath("aml/core");
             AppDomain.CurrentDomain.AppendPrivatePath("aml/mods");
-            
+
+            Helper.SetupArgs(ud);
             Helper.LoadPlugins(dllFiles);
             
             Helper.LogSystem("Core loaded");

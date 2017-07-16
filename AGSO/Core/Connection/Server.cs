@@ -3,6 +3,7 @@ using PluginUtils.Injection.Input;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -17,6 +18,7 @@ namespace AGSO.Core.Connection
         {
             public Remote Remote;
             public int PlayerIndex;
+            public long PingTime;
         }
 
         private List<ClientInfo> _Clients = new List<ClientInfo>();
@@ -33,11 +35,13 @@ namespace AGSO.Core.Connection
         {
             ChangeStage(new GameStartHandler { Parent = this });
             ConnectionSelectForm.Log("Game start");
+            NetworkLogHelper.Write("User game start");
             ConnectionSelectForm.CloseWindow();
         }
 
         private void RemoveClient(Remote r)
         {
+            NetworkLogHelper.Write("Remove client " + r.ToString());
             r.ReceiveCount = 100;
             Connection.Block(r);
             if (r.Data == null)
@@ -45,16 +49,18 @@ namespace AGSO.Core.Connection
                 return;
             }
             _Clients.Remove((ClientInfo)r.Data);
-            ConnectionSelectForm.Log("[D] Client " + _Clients.Count);
+            ConnectionSelectForm.Log("Remove client " + r.Address.ToString());
         }
 
         private class WaitForStartHandler : IConnectionStage
         {
             public Server _Parent;
             private int _CountForUpdateRemote;
+            private Stopwatch _Clock = new Stopwatch();
 
             public void OnStart()
             {
+                ConnectionSelectForm.Log("Server start");
             }
 
             public void OnPacket(Remote r)
@@ -63,49 +69,65 @@ namespace AGSO.Core.Connection
                 switch (type)
                 {
                     case PacketType.None:
+                        NetworkLogHelper.Write("Empty packet");
                         //empty packet
                         r.ReceiveCount -= 1;
-                        _Parent.Connection.Buffer.Write(PacketType.None);
+                        _Parent.Connection.Buffer.Write(PacketType.None, 0);
                         _Parent.Connection.Send(r);
                         return;
                     case PacketType.NewConnection:
+                        NetworkLogHelper.Write("New connection");
                         if (r.ReceiveCount == 1)
                         {
+                            NetworkLogHelper.Write("New connection accepted");
                             ClientInfo ci = new ClientInfo();
                             ci.Remote = r;
                             r.Data = ci;
                             _Parent._Clients.Add(ci);
 
-                            //just reply
-                            SendStatus(r);
+                            _Parent.Connection.Buffer.Write(PacketType.ConnectionAccept, 0);
+                            _Parent.Connection.Send(r);
 
                             ConnectionSelectForm.Log("New client " + r.ToString());
-                            ConnectionSelectForm.Log("[A] Client " + _Parent._Clients.Count);
                             return;
                         }
                         break;
                     case PacketType.ClientStatus:
+                        NetworkLogHelper.Write("Client status");
                         if (r.ReceiveCount != 1)
                         {
+                            NetworkLogHelper.Write("Client status replied");
                             //TODO check if active client
                             //we don't need any information, just reply
                             SendStatus(r);
-
-                            ConnectionSelectForm.Log("Client status " + r.ToString());
                             return;
                         }
                         break;
+                    case PacketType.PingRequest:
+                        _Parent.Connection.Buffer.Write(PacketType.PingReply, 0);
+                        _Parent.Connection.Send(r);
+                        return;
+                    case PacketType.PingReply:
+                        {
+                            var client = (ClientInfo)r.Data;
+                            if (client != null)
+                            {
+                                client.PingTime = _Clock.ElapsedMilliseconds;
+                            }
+                        }
+                        return;
                     default:
                         break;
                 }
                 ConnectionSelectForm.Log("Error");
+                NetworkLogHelper.Write("Error", _Parent.Connection.Buffer);
                 _Parent.RemoveClient(r);
             }
 
             public void OnTick()
             {
                 //check every 1s
-                if (++_CountForUpdateRemote > 20)
+                if (++_CountForUpdateRemote > 200)
                 {
                     _CountForUpdateRemote = 0;
 
@@ -114,11 +136,23 @@ namespace AGSO.Core.Connection
 
                     for (int i = 0; i < _Parent._Clients.Count; ++i)
                     {
-                        if (!_Parent.Connection.UpdateRemoteList(_Parent._Clients[i].Remote, 1000 * 100, 1000))
+                        var r = _Parent._Clients[i].Remote;
+                        if (!_Parent.Connection.UpdateRemoteList(r, 1000 * 100, 1000))
                         {
                             _Parent._Clients.RemoveAt(i);
                             i -= 1;
-                            ConnectionSelectForm.Log("[C] Client " + _Parent._Clients.Count);
+                            ConnectionSelectForm.Log("Remove client " + r.Address.ToString());
+                        }
+                    }
+
+                    if (_Parent._Clients.All(c => c.PingTime != -1))
+                    {
+                        ConnectionSelectForm.Ping(_Parent._Clients.Select(c => (int)c.PingTime).ToArray());
+                        _Clock.Restart();
+                        for (int i = 0; i < _Parent._Clients.Count; ++i)
+                        {
+                            _Parent.Connection.Buffer.Write(PacketType.PingRequest, 0);
+                            _Parent.Connection.Send(_Parent._Clients[i].Remote);
                         }
                     }
                 }
@@ -127,7 +161,7 @@ namespace AGSO.Core.Connection
 
             private void SendStatus(Remote r)
             {
-                _Parent.Connection.Buffer.Write(PacketType.ServerStatus);
+                _Parent.Connection.Buffer.Write(PacketType.ServerStatus, 0);
                 _Parent.Connection.Send(r);
             }
 
@@ -137,7 +171,7 @@ namespace AGSO.Core.Connection
 
             public int Interval
             {
-                get { return 50; }
+                get { return 5; }
             }
         }
 
@@ -145,13 +179,19 @@ namespace AGSO.Core.Connection
         {
             public Server Parent;
             private bool[] _Ready;
+            private static byte _NextSessionID = 1;
+            private byte _CurrentSession;
+            private int _CountForPing;
 
             public void OnStart()
             {
-                ConnectionSelectForm.Log("[E] Client " + Parent._Clients.Count);
+                NetworkLogHelper.Write("Start stage");
                 var client = new ClientInfo[3];
 
-                Parent.Connection.Buffer.Write(PacketType.GameStart);
+                var sid = _NextSessionID++;
+                _CurrentSession = sid;
+
+                Parent.Connection.Buffer.Write(PacketType.GameStart, sid);
                 for (int i = 0; i < Parent._Clients.Count; ++i)
                 {
                     Parent._Clients[i].PlayerIndex = i + 1;
@@ -163,7 +203,7 @@ namespace AGSO.Core.Connection
 
                 _Ready = client.Select(c => c == null).ToArray();
 
-                Parent._InputHandler = new ServerInputHandler(client, 0);
+                Parent._InputHandler = new ServerInputHandler(client, 0, sid);
                 InputManager.RegisterHandler(Parent._InputHandler);
 
                 CheckReady();
@@ -177,20 +217,34 @@ namespace AGSO.Core.Connection
                 switch (type)
                 {
                     case PacketType.NewConnection:
+                        NetworkLogHelper.Write("New connection in game");
                         //TODO
                         return;
                     case PacketType.ClientReady:
                         ConnectionSelectForm.Log("Ready " + r.ToString());
+                        NetworkLogHelper.Write("Client ready");
                         _Ready[RemoteIndex(r)] = true;
                         CheckReady();
                         return;
                     case PacketType.ClientStatus:
+                        NetworkLogHelper.Write("Client status in game");
                         //ignore
                         return;
                     case PacketType.ClientInputData:
                         //
+                        NetworkLogHelper.Write("Client input", Parent.Connection.Buffer);
+                        if (!CheckSessionID())
+                        {
+                            break;
+                        }
                         Parent.Connection.Buffer.ReadBytes(_ByteBuffer);
                         Parent._InputHandler.ReceiveNetworkData(RemoteIndex(r), _ByteBuffer);
+                        return;
+                    case PacketType.PingRequest:
+                        Parent.Connection.Buffer.Write(PacketType.PingReply, 0);
+                        Parent.Connection.Send(r);
+                        return;
+                    case PacketType.PingReply:
                         return;
                     default:
                         break;
@@ -210,9 +264,23 @@ namespace AGSO.Core.Connection
                 }
             }
 
+            private bool CheckSessionID()
+            {
+                return Parent.Connection.Buffer.ReadByte() == _CurrentSession;
+            }
+
             public void OnTick()
             {
                 Parent._InputHandler.SendNetworkData(Parent.Connection);
+                if (++_CountForPing == 120)
+                {
+                    _CountForPing = 0;
+                    for (int i = 0; i < Parent._Clients.Count; ++i)
+                    {
+                        Parent.Connection.Buffer.Write(PacketType.PingRequest, 0);
+                        Parent.Connection.Send(Parent._Clients[i].Remote);
+                    }
+                }
             }
 
             public void OnAbort()

@@ -43,6 +43,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArgHelper.cs" />
     <Compile Include="Attrtibutes.cs" />
     <Compile Include="Exceptions.cs" />
     <Compile Include="IAMLCorePlugin.cs" />
@@ -59,12 +60,14 @@
     <Compile Include="Injection\Input\IInputHandler.cs" />
     <Compile Include="Injection\Input\InputInjectorPlugin.cs" />
     <Compile Include="Injection\Input\InputManager.cs" />
+    <Compile Include="Injection\Input\KeyConfigInjector.cs" />
     <Compile Include="Injection\Native\AddressHelper.cs" />
     <Compile Include="Injection\Native\AssemblyCodeStorage.cs" />
     <Compile Include="Injection\Native\CodeModification.cs" />
     <Compile Include="Injection\Native\NativeEntrance.cs" />
     <Compile Include="Injection\Native\NativeFunctions.cs" />
     <Compile Include="Injection\Native\NativeWrapper.cs" />
+    <Compile Include="Injection\Native\SimpleLogInjection.cs" />
     <Compile Include="Injection\SaveData\GSDataFile.cs" />
     <Compile Include="Injection\SaveData\SaveDataHelper.cs" />
     <Compile Include="Injection\SaveData\SaveDataInjector.cs" />
@@ -85,9 +88,6 @@
     <Compile Include="UtilsClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WindowsHelper.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

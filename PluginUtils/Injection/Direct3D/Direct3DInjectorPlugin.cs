@@ -45,7 +45,7 @@ namespace PluginUtils.Injection.Direct3D
             }
         }
 
-        private class InjectD3DCreateDevice : NativeWrapper
+        internal class InjectD3DCreateDevice : NativeWrapper
         {
             private delegate int CreateDeviceDelegate(
                 IntPtr pD3d,

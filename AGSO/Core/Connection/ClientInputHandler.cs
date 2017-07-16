@@ -18,10 +18,12 @@ namespace AGSO.Core.Connection
         private volatile int _Ready;
         private readonly ClientRecorder _Recorder;
         private readonly ClientSequenceHandler _Sequence;
+        private byte _SessionID;
 
-        public ClientInputHandler()
+        public ClientInputHandler(byte sid)
         {
             KeyConfigInjector.Inject();
+            _SessionID = sid;
             _Recorder = new ClientRecorder(ServerInputHandler.InitEmptyCount);
             _Sequence = new ClientSequenceHandler(this);
         }
@@ -47,13 +49,13 @@ namespace AGSO.Core.Connection
             if (_Ready == 1)
             {
                 _Ready = 2;
-                conn.Buffer.Write(PacketType.ClientReady);
+                conn.Buffer.Write(PacketType.ClientReady, _SessionID);
                 conn.Send(r);
             }
             byte[] cdata;
             while (_Recorder.TryDequeue(out cdata))
             {
-                conn.Buffer.Write(PacketType.ClientInputData, cdata);
+                conn.Buffer.Write(PacketType.ClientInputData, _SessionID, cdata);
                 conn.Send(r);
             }
         }

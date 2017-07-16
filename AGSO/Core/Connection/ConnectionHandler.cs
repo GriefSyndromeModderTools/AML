@@ -18,14 +18,15 @@ namespace AGSO.Core.Connection
         private volatile int _Interval = 1;
         private volatile IConnectionStage _Stage;
 
-        public void Connect()
-        {
-            _Connection = new Conn(1024);
-        }
-
         public Conn Connection
         {
             get { return _Connection; }
+        }
+
+        public void Connect()
+        {
+            _Connection = new Conn(1024);
+            _Connection.Client();
         }
 
         public void Connect(int port)

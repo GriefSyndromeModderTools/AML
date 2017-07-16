@@ -77,6 +77,5 @@ namespace AGSO.Network
         static WinSock()
         {
         }
-
     }
 }
